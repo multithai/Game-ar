@@ -1,0 +1,375 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0" />
+<title>ระบบจัดเก็บรายได้ & ชำระเงิน — อบต.บึงคำพร้อย Demo</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
+<style>
+  :root{
+    --green:#1f9d55;--green-dark:#15803d;--green-light:#dcf5e6;--green-soft:#eefaf2;
+    --line:#06c755;--blue:#2563eb;--blue-soft:#e7efff;--amber:#f59e0b;--amber-soft:#fef4e2;
+    --red:#ef4444;--red-soft:#fde8e6;--ink:#13261b;--muted:#5c6b62;--bg:#eef3ef;--card:#fff;
+    --radius:16px;--shadow:0 8px 24px rgba(18,52,33,.08);--shadow-lg:0 18px 44px rgba(18,52,33,.14);
+  }
+  *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;}
+  body{font-family:'Prompt',system-ui,sans-serif;background:var(--bg);color:var(--ink);line-height:1.5;}
+  button,input,select{font-family:inherit;font-size:inherit;}
+  .app{max-width:920px;margin:0 auto;min-height:100vh;}
+  .topbar{position:sticky;top:0;z-index:30;background:linear-gradient(135deg,#0e7490,#0891b2);color:#fff;padding:11px 16px;display:flex;align-items:center;gap:11px;box-shadow:0 4px 14px rgba(0,0,0,.12);}
+  .topbar .seal{width:36px;height:36px;border-radius:10px;background:rgba(255,255,255,.2);display:grid;place-items:center;font-size:19px;flex:none;}
+  .topbar .ttl{font-weight:700;font-size:14.5px;line-height:1.2;}
+  .topbar .ttl small{display:block;font-weight:400;font-size:10.5px;opacity:.85;}
+  .topbar .reset{margin-left:auto;background:rgba(255,255,255,.18);border:none;color:#fff;padding:7px 11px;border-radius:9px;font-size:12px;cursor:pointer;}
+  .nav2{display:flex;gap:8px;padding:8px 12px;background:#fff;font-size:12.5px;align-items:center;box-shadow:0 2px 8px rgba(0,0,0,.04);}
+  .nav2 a{color:var(--muted);text-decoration:none;padding:5px 10px;border-radius:8px;font-weight:600;}
+  .nav2 a:hover{background:var(--green-light);color:var(--green-dark);}
+  .nav2 .sep{color:#cbd5cf;}
+
+  .roles{display:flex;gap:6px;padding:10px 12px;background:#fff;position:sticky;top:58px;z-index:25;box-shadow:0 2px 10px rgba(0,0,0,.04);overflow-x:auto;}
+  .role-btn{flex:1;min-width:104px;border:1px solid #dde8e1;background:#fff;color:var(--ink);padding:9px 8px;border-radius:11px;font-weight:600;font-size:13px;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:3px;transition:.18s;}
+  .role-btn .em{font-size:18px;}
+  .role-btn.active{background:#0891b2;color:#fff;border-color:#0891b2;box-shadow:0 6px 14px rgba(8,145,178,.25);}
+  main{padding:14px 12px 90px;}
+  .view{animation:fade .3s ease;}
+  @keyframes fade{from{opacity:0;transform:translateY(8px);}to{opacity:1;transform:translateY(0);}}
+  .card{background:var(--card);border-radius:var(--radius);box-shadow:var(--shadow);padding:18px;margin-bottom:14px;border:1px solid #eef4f0;}
+  .card h3{font-size:16px;font-weight:700;margin-bottom:4px;display:flex;align-items:center;gap:8px;}
+  .card .hint{font-size:12.5px;color:var(--muted);margin-bottom:6px;}
+  .acct{background:linear-gradient(135deg,#0e7490,#0891b2);color:#fff;border-radius:14px;padding:16px;margin-bottom:14px;}
+  .acct .nm{font-weight:700;font-size:16px;}
+  .acct .ad{font-size:12px;opacity:.9;margin-top:2px;}
+  .acct .sum{display:flex;gap:18px;margin-top:14px;}
+  .acct .sum .x .n{font-size:22px;font-weight:800;}
+  .acct .sum .x .l{font-size:11px;opacity:.85;}
+
+  .bill{background:#fff;border:1px solid #eef4f0;border-radius:14px;padding:15px;margin-bottom:12px;box-shadow:var(--shadow);}
+  .bill .top{display:flex;justify-content:space-between;align-items:flex-start;gap:10px;}
+  .bill .ic{width:42px;height:42px;border-radius:11px;display:grid;place-items:center;font-size:21px;flex:none;}
+  .bill .ti{flex:1;}
+  .bill .ty{font-weight:700;font-size:15px;}
+  .bill .rf{font-size:11.5px;color:var(--muted);}
+  .bill .amt{font-size:19px;font-weight:800;text-align:right;}
+  .bill .amt small{display:block;font-size:11px;font-weight:500;color:var(--muted);}
+  .bill .meta{font-size:12.5px;color:var(--muted);display:flex;flex-wrap:wrap;gap:12px;margin-top:10px;}
+  .badge{display:inline-flex;align-items:center;gap:6px;padding:5px 11px;border-radius:999px;font-size:12px;font-weight:700;}
+  .b-unpaid{background:var(--amber-soft);color:#b45309;}
+  .b-paid{background:var(--green-light);color:var(--green-dark);}
+  .b-overdue{background:var(--red-soft);color:#b91c1c;}
+  .dot{width:8px;height:8px;border-radius:50%;}
+  .btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;border:none;border-radius:11px;padding:12px 18px;font-weight:600;font-size:14px;cursor:pointer;transition:.18s;}
+  .btn-pay{background:#0891b2;color:#fff;width:100%;margin-top:12px;box-shadow:0 8px 18px rgba(8,145,178,.3);}
+  .btn-pay:active{transform:scale(.98);}
+  .btn-primary{background:var(--line);color:#fff;width:100%;box-shadow:0 8px 18px rgba(6,199,85,.3);}
+  .btn-ghost{background:#fff;border:1.5px solid #dde8e1;color:var(--ink);}
+  .btn-sm{padding:8px 12px;font-size:12.5px;border-radius:9px;}
+  .paid-line{margin-top:12px;border-top:1px dashed #e4efe8;padding-top:10px;font-size:12.5px;color:var(--green-dark);display:flex;align-items:center;gap:7px;}
+
+  .empty{text-align:center;padding:40px 20px;color:var(--muted);}
+  .empty .em{font-size:42px;}
+  .seg{display:flex;gap:6px;margin-bottom:12px;overflow-x:auto;}
+  .seg button{white-space:nowrap;border:1.5px solid #dde8e1;background:#fff;color:var(--muted);padding:7px 13px;border-radius:999px;font-size:12.5px;font-weight:600;cursor:pointer;}
+  .seg button.on{background:var(--ink);color:#fff;border-color:var(--ink);}
+  .mini{font-size:11px;color:var(--muted);}
+
+  /* dashboard */
+  .kpis{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:14px;}
+  .kpi{border-radius:14px;padding:15px;color:#fff;}
+  .kpi.t{background:linear-gradient(135deg,#0891b2,#0e7490);}
+  .kpi.c{background:linear-gradient(135deg,#1f9d55,#15803d);}
+  .kpi.o{background:linear-gradient(135deg,#ef4444,#b91c1c);}
+  .kpi .n{font-size:23px;font-weight:800;line-height:1.05;}
+  .kpi .l{font-size:11px;opacity:.92;margin-top:5px;}
+  .bar-row{display:flex;align-items:center;gap:10px;margin-bottom:11px;font-size:13px;}
+  .bar-row .nm{width:120px;flex:none;font-weight:500;display:flex;align-items:center;gap:6px;}
+  .bar-tk{flex:1;background:#eef4f0;border-radius:999px;height:10px;overflow:hidden;}
+  .bar-fl{height:100%;border-radius:999px;background:linear-gradient(90deg,#22d3ee,#0891b2);}
+  .bar-row .vl{width:74px;text-align:right;color:var(--muted);font-weight:700;font-size:11.5px;}
+
+  /* staff table */
+  .frow{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:12px 0;border-bottom:1px solid #f0f5f2;}
+  .frow:last-child{border:none;}
+  .frow .l{flex:1;min-width:0;}
+  .frow .l .nm{font-weight:600;font-size:14px;}
+  .frow .l .sb{font-size:11.5px;color:var(--muted);}
+  .frow .r{text-align:right;flex:none;}
+  .frow .r .am{font-weight:700;font-size:14px;}
+
+  /* toast + modal */
+  .toast{position:fixed;left:50%;bottom:26px;transform:translateX(-50%) translateY(40px);background:var(--green-dark);color:#fff;padding:13px 20px;border-radius:12px;font-size:14px;font-weight:600;box-shadow:var(--shadow-lg);z-index:100;opacity:0;transition:.3s;max-width:90%;text-align:center;}
+  .toast.show{opacity:1;transform:translateX(-50%) translateY(0);}
+  .modal{position:fixed;inset:0;background:rgba(10,20,15,.55);display:none;align-items:center;justify-content:center;z-index:90;padding:18px;}
+  .modal.show{display:flex;}
+  .modal .box{background:#fff;border-radius:20px;padding:24px;max-width:360px;width:100%;animation:pop .3s ease;max-height:92vh;overflow:auto;}
+  @keyframes pop{from{transform:scale(.85);opacity:0;}to{transform:scale(1);opacity:1;}}
+  .modal h3{font-size:18px;font-weight:700;text-align:center;}
+  .modal .sub{color:var(--muted);font-size:13px;text-align:center;margin:4px 0 14px;}
+  .pay-amt{text-align:center;font-size:30px;font-weight:800;color:#0891b2;margin:6px 0;}
+  .mtabs{display:flex;gap:8px;margin:14px 0;}
+  .mtabs button{flex:1;border:1.5px solid #dde8e1;background:#fff;color:var(--muted);padding:9px;border-radius:10px;font-weight:600;font-size:13px;cursor:pointer;}
+  .mtabs button.on{border-color:#0891b2;background:#ecfeff;color:#0e7490;}
+  .qr{width:180px;height:180px;margin:6px auto 10px;display:block;border:8px solid #fff;border-radius:12px;box-shadow:0 4px 14px rgba(0,0,0,.1);}
+  .pp{text-align:center;font-size:12px;color:var(--muted);margin-bottom:6px;}
+  .pp b{color:var(--ink);}
+  .card-form label{display:block;font-size:12px;font-weight:600;margin:10px 0 5px;}
+  .card-form input{width:100%;border:1.5px solid #dde8e1;border-radius:10px;padding:11px 12px;font-size:14px;background:#fbfdfb;}
+  .ok-circle{width:62px;height:62px;border-radius:50%;background:var(--green-light);display:grid;place-items:center;font-size:30px;margin:0 auto 12px;}
+  .receipt{border:1.5px dashed #cfe0d6;border-radius:12px;padding:14px;margin:12px 0;font-size:13px;}
+  .receipt .r{display:flex;justify-content:space-between;padding:4px 0;}
+  .receipt .r .k{color:var(--muted);}
+  .receipt .r .v{font-weight:600;}
+  .receipt .tot{border-top:1px dashed #cfe0d6;margin-top:6px;padding-top:8px;font-size:15px;}
+</style>
+</head>
+<body>
+<div class="app">
+  <div class="topbar">
+    <div class="seal">💰</div>
+    <div class="ttl">จัดเก็บรายได้ & ชำระเงิน <small>อบต.บึงคำพร้อย · Demo</small></div>
+    <button class="reset" id="resetBtn">↺ รีเซ็ต</button>
+  </div>
+  <div class="nav2">
+    <a href="../">🏠 ระบบหลัก</a><span class="sep">·</span>
+    <a href="../../">📊 หน้านำเสนอ</a>
+  </div>
+  <div class="roles" id="roles"></div>
+  <main id="main"></main>
+</div>
+
+<div class="toast" id="toast"></div>
+<div class="modal" id="modal"><div class="box" id="modalBox"></div></div>
+
+<script>
+/* ============ DATA ============ */
+const KEY='sm_billing_v1';
+const ME='นายสมชาย ใจดี';
+const BTYPES={
+  land:{label:'ภาษีที่ดินและสิ่งปลูกสร้าง',icon:'🏡',color:'#0891b2',bg:'#ecfeff'},
+  water:{label:'ค่าน้ำประปา',icon:'💧',color:'#2563eb',bg:'#e7efff'},
+  waste:{label:'ค่าธรรมเนียมขยะมูลฝอย',icon:'🗑️',color:'#1f9d55',bg:'#dcf5e6'},
+};
+const PAYERS=[ME,'นางสมหญิง รักดี','นายมานพ ทองคำ','ร้านค้าชุมชน หมู่ 5','นางวิไล สุขใจ','นายประสิทธิ์ พูลผล'];
+const DAY=86400000;
+
+function seed(){
+  const t=Date.now();const f=n=>t+n*DAY;
+  let id=0;const mk=(payer,type,addr,period,amount,dueOffset,status,paidOffset)=>{id++;return{
+    id:'b'+id,ref:type.toUpperCase().slice(0,2)+'-'+(68000+id),payer,type,addr,period,amount,
+    due:f(dueOffset),status,paidAt:status==='paid'?f(paidOffset):null,
+    method:status==='paid'?'พร้อมเพย์':null,receipt:status==='paid'?'RC'+(50000+id):null
+  };};
+  return {bills:[
+    mk(ME,'land','99/1 ม.5 ต.บึงคำพร้อย','ปีภาษี 2569',1850,12,'unpaid'),
+    mk(ME,'water','99/1 ม.5 ต.บึงคำพร้อย','มิ.ย. 2569',245,8,'unpaid'),
+    mk(ME,'waste','99/1 ม.5 ต.บึงคำพร้อย','มิ.ย. 2569',40,-3,'overdue'),
+    mk(ME,'water','99/1 ม.5 ต.บึงคำพร้อย','พ.ค. 2569',230,-25,'paid',-22),
+    mk('นางสมหญิง รักดี','land','12 ม.3','ปีภาษี 2569',3200,12,'unpaid'),
+    mk('นางสมหญิง รักดี','waste','12 ม.3','มิ.ย. 2569',40,8,'unpaid'),
+    mk('นายมานพ ทองคำ','land','45 ม.8','ปีภาษี 2569',920,-5,'overdue'),
+    mk('นายมานพ ทองคำ','water','45 ม.8','มิ.ย. 2569',410,8,'unpaid'),
+    mk('ร้านค้าชุมชน หมู่ 5','land','5/9 ม.5','ปีภาษี 2569',7400,-8,'overdue'),
+    mk('ร้านค้าชุมชน หมู่ 5','waste','5/9 ม.5','มิ.ย. 2569',120,-30,'paid',-28),
+    mk('นางวิไล สุขใจ','water','77 ม.1','มิ.ย. 2569',180,-20,'paid',-18),
+    mk('นางวิไล สุขใจ','land','77 ม.1','ปีภาษี 2569',1100,-40,'paid',-35),
+    mk('นายประสิทธิ์ พูลผล','land','3 ม.3','ปีภาษี 2569',2600,12,'unpaid'),
+    mk('นายประสิทธิ์ พูลผล','waste','3 ม.3','มิ.ย. 2569',40,8,'unpaid'),
+  ]};
+}
+function load(){try{const d=JSON.parse(localStorage.getItem(KEY));if(d&&d.bills)return d;}catch(e){}const s=seed();save(s);return s;}
+function save(d){localStorage.setItem(KEY,JSON.stringify(d));}
+let DB=load();
+
+/* normalize overdue based on today */
+function statusOf(b){if(b.status==='paid')return'paid';return Date.now()>b.due?'overdue':'unpaid';}
+const SLABEL={unpaid:{t:'รอชำระ',cls:'b-unpaid',c:'#f59e0b'},paid:{t:'ชำระแล้ว',cls:'b-paid',c:'#1f9d55'},overdue:{t:'เกินกำหนด',cls:'b-overdue',c:'#ef4444'}};
+
+/* ============ HELPERS ============ */
+const $=s=>document.querySelector(s);
+const baht=n=>'฿'+n.toLocaleString('th-TH',{minimumFractionDigits:2,maximumFractionDigits:2});
+const bahtR=n=>'฿'+Math.round(n).toLocaleString('th-TH');
+function fdate(ts){return new Date(ts).toLocaleDateString('th-TH',{day:'numeric',month:'short',year:'2-digit'});}
+function toast(m){const t=$('#toast');t.textContent=m;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),2200);}
+function esc(s){return(s||'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));}
+/* deterministic fake-QR svg from a string */
+function qrSVG(seed){let h=0;for(const c of seed)h=(h*31+c.charCodeAt(0))>>>0;
+  const N=23,cell=8,pad=8,sz=N*cell+pad*2;let r=h;const rnd=()=>{r=(r*1103515245+12345)&0x7fffffff;return r/0x7fffffff;};
+  let rects='';
+  const finder=(ox,oy)=>{let s='';for(let y=0;y<7;y++)for(let x=0;x<7;x++){const edge=x===0||x===6||y===0||y===6;const core=x>=2&&x<=4&&y>=2&&y<=4;if(edge||core)s+=`<rect x="${pad+(ox+x)*cell}" y="${pad+(oy+y)*cell}" width="${cell}" height="${cell}"/>`;}return s;};
+  for(let y=0;y<N;y++)for(let x=0;x<N;x++){
+    const inF=(x<8&&y<8)||(x>N-9&&y<8)||(x<8&&y>N-9);
+    if(inF)continue;
+    if(rnd()>0.5)rects+=`<rect x="${pad+x*cell}" y="${pad+y*cell}" width="${cell}" height="${cell}"/>`;
+  }
+  rects+=finder(0,0)+finder(N-7,0)+finder(0,N-7);
+  return `<svg class="qr" viewBox="0 0 ${sz} ${sz}" xmlns="http://www.w3.org/2000/svg"><rect width="${sz}" height="${sz}" fill="#fff"/><g fill="#0e1512">${rects}</g></svg>`;
+}
+
+/* ============ STATE ============ */
+const ROLES=[
+  {id:'citizen',label:'ประชาชน',em:'👨‍👩‍👧‍👦'},
+  {id:'staff',label:'เจ้าหน้าที่',em:'🧾'},
+  {id:'exec',label:'ผู้บริหาร',em:'📈'},
+];
+let state={role:'citizen'};
+let cFilter='all', sFilter='all';
+
+function renderChrome(){
+  $('#roles').innerHTML=ROLES.map(r=>`<button class="role-btn ${r.id===state.role?'active':''}" data-role="${r.id}"><span class="em">${r.em}</span>${r.label}</button>`).join('');
+}
+function render(){
+  renderChrome();
+  const v={citizen:vCitizen,staff:vStaff,exec:vExec}[state.role];
+  $('#main').innerHTML=`<div class="view">${v()}</div>`;
+  bind();
+}
+
+/* ============ CITIZEN ============ */
+function vCitizen(){
+  const mine=DB.bills.filter(b=>b.payer===ME);
+  const outstanding=mine.filter(b=>statusOf(b)!=='paid');
+  const totalDue=outstanding.reduce((s,b)=>s+b.amount,0);
+  const overdueN=mine.filter(b=>statusOf(b)==='overdue').length;
+  const list=cFilter==='all'?mine:mine.filter(b=>statusOf(b)===cFilter || (cFilter==='unpaid'&&statusOf(b)==='overdue'));
+  const acct=`<div class="acct"><div class="nm">👤 ${ME}</div><div class="ad">99/1 หมู่ 5 ต.บึงคำพร้อย · รหัสผู้เสียภาษี 3-xxxx-xxxxx</div>
+    <div class="sum"><div class="x"><div class="n">${bahtR(totalDue)}</div><div class="l">ยอดค้างชำระรวม</div></div>
+    <div class="x"><div class="n">${outstanding.length}</div><div class="l">รายการรอจ่าย</div></div>
+    <div class="x"><div class="n">${overdueN}</div><div class="l">เกินกำหนด</div></div></div></div>`;
+  const seg=`<div class="seg">
+    <button class="${cFilter==='all'?'on':''}" data-c="all">ทั้งหมด</button>
+    <button class="${cFilter==='unpaid'?'on':''}" data-c="unpaid">⏳ รอชำระ</button>
+    <button class="${cFilter==='paid'?'on':''}" data-c="paid">✅ ชำระแล้ว</button>
+  </div>`;
+  const body=list.length?list.map(billCard).join(''):`<div class="empty"><div class="em">🎉</div>ไม่มีรายการในหมวดนี้</div>`;
+  return acct+seg+body;
+}
+function billCard(b){
+  const ty=BTYPES[b.type],st=statusOf(b),sl=SLABEL[st];
+  const payable=st!=='paid';
+  return `<div class="bill">
+    <div class="top">
+      <div class="ic" style="background:${ty.bg}">${ty.icon}</div>
+      <div class="ti"><div class="ty">${ty.label}</div><div class="rf">เลขที่ ${b.ref} · ${b.period}</div></div>
+      <div class="amt">${baht(b.amount)}<small>${st==='paid'?'ชำระแล้ว':'ครบกำหนด '+fdate(b.due)}</small></div>
+    </div>
+    <div class="meta"><span class="badge ${sl.cls}"><span class="dot" style="background:${sl.c}"></span>${sl.t}</span>
+      ${st==='overdue'?`<span style="color:#b91c1c">⚠️ เลยกำหนด ${Math.ceil((Date.now()-b.due)/DAY)} วัน</span>`:''}</div>
+    ${payable?`<button class="btn btn-pay" data-pay="${b.id}">💳 ชำระเงิน ${baht(b.amount)}</button>`
+      :`<div class="paid-line">✅ ชำระเมื่อ ${fdate(b.paidAt)} · ${b.method} · ใบเสร็จ ${b.receipt} <a href="#" data-receipt="${b.id}" style="margin-left:auto;color:#0891b2;text-decoration:none;font-weight:600">ดูใบเสร็จ</a></div>`}
+  </div>`;
+}
+
+/* ---- payment modal ---- */
+let payId=null,payMethod='qr';
+function openPay(id){payId=id;payMethod='qr';renderPay();$('#modal').classList.add('show');}
+function renderPay(){
+  const b=DB.bills.find(x=>x.id===payId);const ty=BTYPES[b.type];
+  const qr=`<div class="pp">พร้อมเพย์ · <b>อบต.บึงคำพร้อย</b><br/>รหัสอ้างอิง ${b.ref}</div>${qrSVG(b.ref+b.amount)}<div class="pp">สแกนด้วยแอปธนาคารเพื่อชำระ (จำลอง)</div>`;
+  const cardF=`<div class="card-form"><label>หมายเลขบัตร</label><input inputmode="numeric" placeholder="0000 0000 0000 0000" />
+    <label>ชื่อบนบัตร</label><input placeholder="SOMCHAI JAIDEE" />
+    <div style="display:flex;gap:10px"><div style="flex:1"><label>วันหมดอายุ</label><input placeholder="MM/YY" /></div>
+    <div style="flex:1"><label>CVV</label><input inputmode="numeric" placeholder="123" /></div></div></div>`;
+  $('#modalBox').innerHTML=`<h3>ชำระเงิน</h3><div class="sub">${ty.icon} ${ty.label} · ${b.period}</div>
+    <div class="pay-amt">${baht(b.amount)}</div>
+    <div class="mtabs"><button class="${payMethod==='qr'?'on':''}" data-m="qr">📱 พร้อมเพย์ QR</button><button class="${payMethod==='card'?'on':''}" data-m="card">💳 บัตรเครดิต</button></div>
+    ${payMethod==='qr'?qr:cardF}
+    <button class="btn btn-primary" id="confirmPay" style="margin-top:14px">✅ ยืนยันชำระเงิน</button>
+    <button class="btn btn-ghost" id="cancelPay" style="width:100%;margin-top:8px">ยกเลิก</button>`;
+}
+function doPay(){
+  const b=DB.bills.find(x=>x.id===payId);
+  b.status='paid';b.paidAt=Date.now();b.method=payMethod==='qr'?'พร้อมเพย์':'บัตรเครดิต';
+  b.receipt='RC'+(50000+Math.floor(Math.random()*9000));save(DB);
+  showReceipt(b.id,true);
+}
+function showReceipt(id,fresh){
+  const b=DB.bills.find(x=>x.id===id);const ty=BTYPES[b.type];
+  $('#modalBox').innerHTML=`${fresh?'<div class="ok-circle">✅</div><h3>ชำระเงินสำเร็จ</h3><div class="sub">ขอบคุณที่ชำระเงินตรงเวลา</div>':'<h3>ใบเสร็จรับเงิน</h3><div class="sub">อบต.บึงคำพร้อย</div>'}
+    <div class="receipt">
+      <div class="r"><span class="k">เลขที่ใบเสร็จ</span><span class="v">${b.receipt}</span></div>
+      <div class="r"><span class="k">รายการ</span><span class="v">${ty.icon} ${ty.label}</span></div>
+      <div class="r"><span class="k">งวด</span><span class="v">${b.period}</span></div>
+      <div class="r"><span class="k">ผู้ชำระ</span><span class="v">${b.payer}</span></div>
+      <div class="r"><span class="k">ช่องทาง</span><span class="v">${b.method}</span></div>
+      <div class="r"><span class="k">วันที่</span><span class="v">${fdate(b.paidAt)}</span></div>
+      <div class="r tot"><span class="k">ยอดชำระ</span><span class="v" style="color:#0891b2">${baht(b.amount)}</span></div>
+    </div>
+    <button class="btn btn-primary" id="closeReceipt">เสร็จสิ้น</button>`;
+  $('#modal').classList.add('show');
+}
+
+/* ============ STAFF ============ */
+function vStaff(){
+  const bills=DB.bills.slice();
+  const total=bills.reduce((s,b)=>s+b.amount,0);
+  const collected=bills.filter(b=>statusOf(b)==='paid').reduce((s,b)=>s+b.amount,0);
+  const outstanding=total-collected;
+  let list=bills;
+  if(sFilter!=='all')list=bills.filter(b=>statusOf(b)===sFilter);
+  list=list.slice().sort((a,b)=>(statusOf(a)==='paid')-(statusOf(b)==='paid')||a.due-b.due);
+  const head=`<div class="card"><h3>🧾 ระบบจัดเก็บรายได้</h3><div class="hint">รายการใบแจ้งหนี้ทั้งหมด · กดบันทึกเมื่อรับชำระเงินสด/เคาน์เตอร์</div>
+    <div class="kpis"><div class="kpi t"><div class="n">${bahtR(total)}</div><div class="l">ยอดแจ้งหนี้รวม</div></div>
+    <div class="kpi c"><div class="n">${bahtR(collected)}</div><div class="l">จัดเก็บได้</div></div>
+    <div class="kpi o"><div class="n">${bahtR(outstanding)}</div><div class="l">ค้างชำระ</div></div></div>
+    <div class="seg"><button class="${sFilter==='all'?'on':''}" data-s="all">ทั้งหมด</button>
+      <button class="${sFilter==='unpaid'?'on':''}" data-s="unpaid">⏳ รอชำระ</button>
+      <button class="${sFilter==='overdue'?'on':''}" data-s="overdue">⚠️ เกินกำหนด</button>
+      <button class="${sFilter==='paid'?'on':''}" data-s="paid">✅ ชำระแล้ว</button></div></div>`;
+  const rows=list.map(b=>{const ty=BTYPES[b.type],st=statusOf(b),sl=SLABEL[st];
+    return `<div class="frow"><div class="l"><div class="nm">${ty.icon} ${esc(b.payer)}</div>
+      <div class="sb">${ty.label} · ${b.period} · ${b.ref}</div>
+      <div style="margin-top:5px"><span class="badge ${sl.cls}"><span class="dot" style="background:${sl.c}"></span>${sl.t}</span></div></div>
+      <div class="r"><div class="am">${baht(b.amount)}</div>
+      ${st!=='paid'?`<button class="btn btn-primary btn-sm markBtn" data-id="${b.id}" style="width:auto;margin-top:6px">รับชำระ</button>`:`<div class="mini">${fdate(b.paidAt)}</div>`}</div></div>`;
+  }).join('');
+  return head+`<div class="card">${rows}</div>`;
+}
+
+/* ============ EXEC ============ */
+function vExec(){
+  const bills=DB.bills;
+  const total=bills.reduce((s,b)=>s+b.amount,0);
+  const collected=bills.filter(b=>statusOf(b)==='paid').reduce((s,b)=>s+b.amount,0);
+  const outstanding=total-collected;
+  const rate=total?Math.round(collected/total*100):0;
+  const overdueAmt=bills.filter(b=>statusOf(b)==='overdue').reduce((s,b)=>s+b.amount,0);
+  const byType=Object.keys(BTYPES).map(k=>{const bs=bills.filter(b=>b.type===k);
+    return{k,ty:BTYPES[k],bill:bs.reduce((s,b)=>s+b.amount,0),col:bs.filter(b=>statusOf(b)==='paid').reduce((s,b)=>s+b.amount,0)};});
+  const tmax=Math.max(1,...byType.map(x=>x.bill));
+  return `<div class="card"><h3>📈 Dashboard รายได้ <span class="mini" style="font-weight:400">· อัปเดตสด</span></h3>
+    <div class="kpis"><div class="kpi t"><div class="n">${bahtR(total)}</div><div class="l">ยอดแจ้งหนี้รวม</div></div>
+    <div class="kpi c"><div class="n">${bahtR(collected)}</div><div class="l">จัดเก็บได้</div></div>
+    <div class="kpi o"><div class="n">${bahtR(outstanding)}</div><div class="l">ค้างชำระ</div></div></div>
+    <div class="bar-row"><span class="nm">อัตราการจัดเก็บ</span><div class="bar-tk"><div class="bar-fl" style="width:${rate}%"></div></div><span class="vl">${rate}%</span></div>
+    <div class="mini" style="margin-top:4px">⚠️ ยอดเกินกำหนดที่ต้องเร่งติดตาม: <b style="color:#b91c1c">${bahtR(overdueAmt)}</b></div>
+  </div>
+  <div class="card"><h3>🗂️ รายได้ตามประเภท</h3>
+    ${byType.map(x=>`<div style="margin-bottom:14px"><div style="display:flex;justify-content:space-between;font-size:13px;margin-bottom:5px"><span>${x.ty.icon} ${x.ty.label}</span><span class="mini">เก็บได้ ${bahtR(x.col)} / ${bahtR(x.bill)}</span></div>
+      <div class="bar-tk" style="height:13px"><div class="bar-fl" style="width:${x.col/tmax*100}%;background:${x.ty.color}"></div><div style="height:0"></div></div></div>`).join('')}
+    <div class="mini">แท่งสีแสดง “เก็บได้จริง” เทียบกับยอดแจ้งหนี้สูงสุด</div>
+  </div>`;
+}
+
+/* ============ BIND ============ */
+function bind(){
+  document.querySelectorAll('[data-pay]').forEach(b=>b.onclick=()=>openPay(b.dataset.pay));
+  document.querySelectorAll('[data-receipt]').forEach(a=>a.onclick=e=>{e.preventDefault();showReceipt(a.dataset.receipt,false);});
+  const seg=document.querySelector('.seg');
+  document.querySelectorAll('[data-c]').forEach(b=>b.onclick=()=>{cFilter=b.dataset.c;render();});
+  document.querySelectorAll('[data-s]').forEach(b=>b.onclick=()=>{sFilter=b.dataset.s;render();});
+  document.querySelectorAll('.markBtn').forEach(b=>b.onclick=()=>{const x=DB.bills.find(z=>z.id===b.dataset.id);
+    x.status='paid';x.paidAt=Date.now();x.method='เงินสด/เคาน์เตอร์';x.receipt='RC'+(50000+Math.floor(Math.random()*9000));save(DB);toast('✅ บันทึกรับชำระแล้ว');render();});
+}
+$('#roles').onclick=e=>{const b=e.target.closest('[data-role]');if(!b)return;state.role=b.dataset.role;cFilter='all';sFilter='all';render();};
+$('#modal').onclick=e=>{
+  const m=e.target.closest('[data-m]');if(m){payMethod=m.dataset.m;renderPay();return;}
+  if(e.target.id==='confirmPay'){doPay();return;}
+  if(e.target.id==='cancelPay'||e.target.id==='closeReceipt'){$('#modal').classList.remove('show');render();return;}
+  if(e.target===$('#modal')){$('#modal').classList.remove('show');}
+};
+$('#resetBtn').onclick=()=>{if(confirm('รีเซ็ตข้อมูลตัวอย่างการชำระเงินกลับเป็นค่าเริ่มต้น?')){localStorage.removeItem(KEY);DB=load();toast('♻️ รีเซ็ตแล้ว');render();}};
+render();
+</script>
+</body>
+</html>
