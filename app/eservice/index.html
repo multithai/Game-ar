@@ -1,0 +1,349 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0" />
+<title>e-Service ขอใบอนุญาต/เอกสาร — อบต.บึงคำพร้อย Demo</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
+<style>
+  :root{
+    --or:#ea580c;--or-dark:#c2410c;--or-soft:#fff1e8;
+    --green:#1f9d55;--green-dark:#15803d;--green-light:#dcf5e6;
+    --blue:#2563eb;--blue-soft:#e7efff;--amber:#f59e0b;--amber-soft:#fef4e2;
+    --red:#ef4444;--red-soft:#fde8e6;--ink:#1c1917;--muted:#78716c;--bg:#f5f2ef;--card:#fff;
+    --radius:16px;--shadow:0 8px 24px rgba(67,40,20,.08);--shadow-lg:0 18px 44px rgba(67,40,20,.16);
+  }
+  *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;}
+  body{font-family:'Prompt',system-ui,sans-serif;background:var(--bg);color:var(--ink);line-height:1.5;}
+  button,input,select,textarea{font-family:inherit;font-size:inherit;}
+  .app{max-width:920px;margin:0 auto;min-height:100vh;}
+  .topbar{position:sticky;top:0;z-index:30;background:linear-gradient(135deg,var(--or-dark),var(--or));color:#fff;padding:11px 16px;display:flex;align-items:center;gap:11px;box-shadow:0 4px 14px rgba(0,0,0,.12);}
+  .topbar .seal{width:36px;height:36px;border-radius:10px;background:rgba(255,255,255,.2);display:grid;place-items:center;font-size:19px;flex:none;}
+  .topbar .ttl{font-weight:700;font-size:14.5px;line-height:1.2;}
+  .topbar .ttl small{display:block;font-weight:400;font-size:10.5px;opacity:.85;}
+  .topbar .reset{margin-left:auto;background:rgba(255,255,255,.18);border:none;color:#fff;padding:7px 11px;border-radius:9px;font-size:12px;cursor:pointer;}
+  .nav2{display:flex;gap:6px;padding:8px 12px;background:#fff;font-size:12.5px;align-items:center;box-shadow:0 2px 8px rgba(0,0,0,.04);overflow-x:auto;}
+  .nav2 a{color:var(--muted);text-decoration:none;padding:5px 9px;border-radius:8px;font-weight:600;white-space:nowrap;}
+  .nav2 a:hover{background:var(--or-soft);color:var(--or-dark);}
+  .nav2 .sep{color:#d6d3d1;}
+  .roles{display:flex;gap:6px;padding:10px 12px;background:#fff;position:sticky;top:58px;z-index:25;box-shadow:0 2px 10px rgba(0,0,0,.04);overflow-x:auto;}
+  .role-btn{flex:1;min-width:104px;border:1px solid #e7e2dc;background:#fff;color:var(--ink);padding:9px 8px;border-radius:11px;font-weight:600;font-size:13px;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:3px;transition:.18s;}
+  .role-btn .em{font-size:18px;}
+  .role-btn.active{background:var(--or-dark);color:#fff;border-color:var(--or-dark);box-shadow:0 6px 14px rgba(194,65,12,.25);}
+  main{padding:14px 12px 90px;}
+  .view{animation:fade .3s ease;}
+  @keyframes fade{from{opacity:0;transform:translateY(8px);}to{opacity:1;transform:translateY(0);}}
+  .card{background:var(--card);border-radius:var(--radius);box-shadow:var(--shadow);padding:18px;margin-bottom:14px;border:1px solid #f0ebe5;}
+  .card h3{font-size:16px;font-weight:700;margin-bottom:4px;display:flex;align-items:center;gap:8px;}
+  .card .hint{font-size:12.5px;color:var(--muted);margin-bottom:12px;}
+  label.fl{display:block;font-size:13px;font-weight:600;margin:14px 0 7px;}
+  input[type=text],textarea{width:100%;border:1.5px solid #e7e2dc;border-radius:11px;padding:11px 13px;font-size:14px;background:#fdfcfb;}
+  input:focus,textarea:focus{outline:none;border-color:var(--or);background:#fff;}
+  textarea{resize:vertical;min-height:64px;}
+
+  .pt-grid{display:grid;grid-template-columns:1fr;gap:10px;}
+  .pt{border:1.5px solid #e7e2dc;background:#fff;border-radius:13px;padding:14px;cursor:pointer;transition:.15s;display:flex;align-items:center;gap:13px;}
+  .pt:hover{border-color:var(--or);}
+  .pt.sel{border-color:var(--or-dark);background:var(--or-soft);}
+  .pt .pi{font-size:26px;flex:none;}
+  .pt .pn{font-weight:700;font-size:14.5px;}
+  .pt .pd{font-size:11.5px;color:var(--muted);}
+  .pt .chk{margin-left:auto;font-size:18px;color:var(--or-dark);opacity:0;}
+  .pt.sel .chk{opacity:1;}
+
+  .docitem{display:flex;align-items:center;gap:10px;padding:11px 0;border-bottom:1px solid #f3efea;}
+  .docitem:last-child{border:none;}
+  .docitem .di{width:34px;height:34px;border-radius:9px;background:#f3efea;display:grid;place-items:center;font-size:16px;flex:none;}
+  .docitem.done .di{background:var(--green-light);}
+  .docitem .dn{flex:1;font-size:13.5px;font-weight:500;}
+  .docitem .dn small{display:block;color:var(--green-dark);font-weight:400;font-size:11px;}
+  .docitem .ab{flex:none;}
+
+  .btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;border:none;border-radius:11px;padding:12px 16px;font-weight:600;font-size:14px;cursor:pointer;transition:.18s;}
+  .btn-primary{background:var(--or);color:#fff;width:100%;box-shadow:0 8px 18px rgba(234,88,12,.3);}
+  .btn-primary:active{transform:scale(.98);}
+  .btn-primary:disabled{opacity:.45;box-shadow:none;}
+  .btn-ghost{background:#fff;border:1.5px solid #e7e2dc;color:var(--ink);}
+  .btn-sm{padding:8px 12px;font-size:12.5px;border-radius:9px;}
+  .btn-green{background:var(--green);color:#fff;}
+  .btn-blue{background:var(--blue);color:#fff;}
+  .btn-red{background:var(--red);color:#fff;}
+  .btn-amber{background:var(--amber);color:#fff;}
+
+  .badge{display:inline-flex;align-items:center;gap:6px;padding:5px 11px;border-radius:999px;font-size:12px;font-weight:700;}
+  .b-sub{background:var(--amber-soft);color:#b45309;}
+  .b-rev{background:var(--blue-soft);color:#1d4ed8;}
+  .b-need{background:var(--or-soft);color:var(--or-dark);}
+  .b-iss{background:var(--green-light);color:var(--green-dark);}
+  .b-rej{background:var(--red-soft);color:#b91c1c;}
+  .dot{width:8px;height:8px;border-radius:50%;}
+
+  .appcard{background:#fff;border:1px solid #f0ebe5;border-radius:14px;padding:15px;margin-bottom:12px;box-shadow:var(--shadow);}
+  .appcard .top{display:flex;justify-content:space-between;align-items:flex-start;gap:10px;}
+  .appcard .no{font-size:11.5px;color:var(--muted);font-weight:600;}
+  .appcard .tl{font-weight:700;font-size:15px;margin:2px 0;}
+  .appcard .meta{font-size:12.5px;color:var(--muted);display:flex;flex-wrap:wrap;gap:10px;margin-top:6px;}
+  .steps{margin-top:12px;border-top:1px dashed #efe9e3;padding-top:10px;display:flex;flex-direction:column;gap:9px;}
+  .st{display:flex;gap:10px;font-size:12.5px;}
+  .st .sd{width:10px;height:10px;border-radius:50%;margin-top:4px;flex:none;}
+  .st .sw .stt{font-weight:600;}
+  .st .sw .sm{color:var(--muted);}
+
+  .empty{text-align:center;padding:40px 20px;color:var(--muted);}
+  .empty .em{font-size:42px;}
+  .mini{font-size:11px;color:var(--muted);}
+  .seg{display:flex;gap:6px;margin-bottom:12px;overflow-x:auto;}
+  .seg button{white-space:nowrap;border:1.5px solid #e7e2dc;background:#fff;color:var(--muted);padding:7px 13px;border-radius:999px;font-size:12.5px;font-weight:600;cursor:pointer;}
+  .seg button.on{background:var(--ink);color:#fff;border-color:var(--ink);}
+  .row{display:flex;gap:8px;flex-wrap:wrap;}
+
+  .kpis{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:14px;}
+  .kpi{border-radius:13px;padding:13px 10px;color:#fff;text-align:center;}
+  .kpi.t{background:linear-gradient(135deg,#ea580c,#c2410c);}
+  .kpi.i{background:linear-gradient(135deg,#1f9d55,#15803d);}
+  .kpi.p{background:linear-gradient(135deg,#2563eb,#1e40af);}
+  .kpi.r{background:linear-gradient(135deg,#ef4444,#b91c1c);}
+  .kpi .n{font-size:23px;font-weight:800;line-height:1;}
+  .kpi .l{font-size:10.5px;opacity:.92;margin-top:4px;}
+  .bar-row{display:flex;align-items:center;gap:10px;margin-bottom:11px;font-size:13px;}
+  .bar-row .nm{width:150px;flex:none;font-weight:500;font-size:12px;}
+  .bar-tk{flex:1;background:#f0ebe5;border-radius:999px;height:10px;overflow:hidden;}
+  .bar-fl{height:100%;border-radius:999px;background:linear-gradient(90deg,#fb923c,#c2410c);}
+  .bar-row .vl{width:30px;text-align:right;color:var(--muted);font-weight:700;font-size:12px;}
+
+  .toast{position:fixed;left:50%;bottom:26px;transform:translateX(-50%) translateY(40px);background:var(--or-dark);color:#fff;padding:13px 20px;border-radius:12px;font-size:14px;font-weight:600;box-shadow:var(--shadow-lg);z-index:100;opacity:0;transition:.3s;max-width:90%;text-align:center;}
+  .toast.show{opacity:1;transform:translateX(-50%) translateY(0);}
+  .modal{position:fixed;inset:0;background:rgba(30,20,10,.55);display:none;align-items:center;justify-content:center;z-index:90;padding:18px;}
+  .modal.show{display:flex;}
+  .modal .box{background:#fff;border-radius:20px;padding:24px;max-width:360px;width:100%;text-align:center;animation:pop .3s ease;max-height:92vh;overflow:auto;}
+  @keyframes pop{from{transform:scale(.85);opacity:0;}to{transform:scale(1);opacity:1;}}
+  .ok-circle{width:60px;height:60px;border-radius:50%;background:var(--or-soft);display:grid;place-items:center;font-size:30px;margin:0 auto 12px;}
+  .modal h3{font-size:18px;font-weight:700;}
+  .modal .nobig{font-size:24px;font-weight:800;color:var(--or-dark);margin:8px 0 2px;letter-spacing:.5px;}
+  .modal p{color:var(--muted);font-size:13px;margin:2px 0;}
+  /* certificate */
+  .cert{border:3px double var(--or-dark);border-radius:12px;padding:18px 16px;margin:6px 0 14px;background:linear-gradient(180deg,#fffdfb,#fff7f0);text-align:center;}
+  .cert .gov{font-size:11px;color:var(--muted);}
+  .cert .seal{font-size:34px;margin:4px 0;}
+  .cert .ct{font-weight:800;font-size:16px;color:var(--or-dark);}
+  .cert .cno{font-size:12px;color:var(--muted);margin:3px 0 10px;}
+  .cert .cr{display:flex;justify-content:space-between;font-size:12.5px;padding:3px 0;text-align:left;}
+  .cert .cr .k{color:var(--muted);}
+  .cert .cr .v{font-weight:600;}
+  .cert .sign{margin-top:12px;font-size:11px;color:var(--muted);}
+  .cert .sign b{display:block;color:var(--ink);font-size:12.5px;}
+</style>
+</head>
+<body>
+<div class="app">
+  <div class="topbar">
+    <div class="seal">📋</div>
+    <div class="ttl">e-Service ขอใบอนุญาต <small>อบต.บึงคำพร้อย · Demo</small></div>
+    <button class="reset" id="resetBtn">↺ รีเซ็ต</button>
+  </div>
+  <div class="nav2"><a href="../">🏠 ระบบหลัก</a><span class="sep">·</span><a href="../billing/">💰 ชำระเงิน</a><span class="sep">·</span><a href="../queue/">📅 จองคิว</a><span class="sep">·</span><a href="../../">📊 หน้านำเสนอ</a></div>
+  <div class="roles" id="roles"></div>
+  <main id="main"></main>
+</div>
+<div class="toast" id="toast"></div>
+<div class="modal" id="modal"><div class="box" id="modalBox"></div></div>
+
+<script>
+/* ============ DATA ============ */
+const KEY='sm_eservice_v1';
+const ME='นายสมชาย ใจดี';
+const PT={
+  build:{label:'ขออนุญาตก่อสร้างอาคาร',dept:'กองช่าง',icon:'🏗️',code:'B',fee:'ตามขนาดอาคาร',valid:1,docs:['สำเนาบัตรประชาชน','สำเนาโฉนดที่ดิน','แบบแปลนก่อสร้าง','หนังสือยินยอมของเจ้าของที่ดิน']},
+  house:{label:'ขอเลขที่บ้าน',dept:'สำนักปลัด',icon:'🏠',code:'H',fee:'ไม่มีค่าธรรมเนียม',valid:0,docs:['สำเนาบัตรประชาชน','ใบอนุญาตก่อสร้าง','รูปถ่ายบ้านที่สร้างเสร็จ']},
+  commerce:{label:'จดทะเบียนพาณิชย์',dept:'กองคลัง',icon:'🏪',code:'C',fee:'50 บาท',valid:0,docs:['สำเนาบัตรประชาชน','สำเนาทะเบียนบ้านร้านค้า','แผนที่ตั้งร้าน']},
+  health:{label:'ใบอนุญาตกิจการอันตรายต่อสุขภาพ',dept:'กองสาธารณสุข',icon:'🏭',code:'S',fee:'ตามประเภทกิจการ',valid:1,docs:['สำเนาบัตรประชาชน','สำเนาทะเบียนบ้าน','แผนผังสถานประกอบการ']},
+  cert:{label:'ขอหนังสือรับรองต่าง ๆ',dept:'สำนักปลัด',icon:'📜',code:'R',fee:'ไม่มีค่าธรรมเนียม',valid:0,docs:['สำเนาบัตรประชาชน','เอกสารประกอบคำขอ']},
+};
+const ST={submitted:{t:'ยื่นคำขอแล้ว',c:'#f59e0b',cls:'b-sub'},reviewing:{t:'กำลังตรวจสอบเอกสาร',c:'#2563eb',cls:'b-rev'},need_docs:{t:'ขอเอกสารเพิ่มเติม',c:'#ea580c',cls:'b-need'},issued:{t:'ออกใบอนุญาตแล้ว',c:'#1f9d55',cls:'b-iss'},rejected:{t:'ไม่อนุมัติ',c:'#ef4444',cls:'b-rej'}};
+const ORDER={submitted:0,reviewing:1,need_docs:2,issued:3,rejected:4};
+const DAY=86400000;
+
+function seed(){
+  const t=Date.now();let id=0;const A=[];
+  const mk=(type,applicant,addr,detail,status,ageD,ups,lic)=>{id++;A.push({
+    id:'e'+id,no:'ES'+(69000+id),type,applicant,addr,phone:'08x-xxx-'+String(2000+id).slice(-4),detail,
+    docs:PT[type].docs.map(d=>({name:d,attached:true})),status,createdAt:t-ageD*DAY,updates:ups,license:lic});};
+  mk('build','บริษัท บ้านสวย จำกัด','เลขที่ 5 ม.5','สร้างบ้านพักอาศัย 2 ชั้น พื้นที่ 180 ตร.ม.','issued',9,
+    [{s:'submitted',n:'รับคำขอเข้าระบบ',at:t-9*DAY,by:'ระบบ'},{s:'reviewing',n:'ตรวจสอบแบบแปลนและเอกสาร',at:t-7*DAY,by:'กองช่าง'},{s:'issued',n:'อนุมัติและออกใบอนุญาต',at:t-3*DAY,by:'กองช่าง'}],
+    {no:'อ.1/2569',issuedAt:t-3*DAY,expireAt:t+362*DAY});
+  mk('commerce','ร้านกาแฟบ้านสวน','12 ม.3','จดทะเบียนพาณิชย์ ร้านขายเครื่องดื่ม','reviewing',2,
+    [{s:'submitted',n:'รับคำขอเข้าระบบ',at:t-2*DAY,by:'ระบบ'},{s:'reviewing',n:'อยู่ระหว่างตรวจสอบเอกสาร',at:t-1*DAY,by:'กองคลัง'}],null);
+  mk('house','นางสมหญิง รักดี','45 ม.8','ขอเลขที่บ้านหลังใหม่','need_docs',4,
+    [{s:'submitted',n:'รับคำขอเข้าระบบ',at:t-4*DAY,by:'ระบบ'},{s:'reviewing',n:'ตรวจสอบเอกสาร',at:t-3*DAY,by:'สำนักปลัด'},{s:'need_docs',n:'กรุณาแนบรูปถ่ายบ้านที่ชัดเจนเพิ่มเติม',at:t-2*DAY,by:'สำนักปลัด'}],null);
+  mk('health','นายมานพ ทองคำ','3 ม.3','ขออนุญาตประกอบกิจการล้างอัดฉีดรถยนต์','submitted',1,
+    [{s:'submitted',n:'รับคำขอเข้าระบบ รอเจ้าหน้าที่ตรวจสอบ',at:t-1*DAY,by:'ระบบ'}],null);
+  return {apps:A};
+}
+function load(){try{const d=JSON.parse(localStorage.getItem(KEY));if(d&&d.apps)return d;}catch(e){}const s=seed();save(s);return s;}
+function save(d){localStorage.setItem(KEY,JSON.stringify(d));}
+let DB=load();
+
+/* ============ HELPERS ============ */
+const $=s=>document.querySelector(s);
+function toast(m){const t=$('#toast');t.textContent=m;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),2200);}
+function esc(s){return(s||'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));}
+function fdate(ts){return new Date(ts).toLocaleDateString('th-TH',{day:'numeric',month:'short',year:'2-digit'});}
+function licNo(type){const n=DB.apps.filter(a=>a.type===type&&a.license).length+1;return PT[type].code+'.'+n+'/2569';}
+
+/* ============ STATE ============ */
+const ROLES=[{id:'citizen',label:'ประชาชน',em:'👨‍👩‍👧‍👦'},{id:'staff',label:'เจ้าหน้าที่',em:'🗂️'},{id:'exec',label:'ผู้บริหาร',em:'📈'}];
+let state={role:'citizen'};
+let cView='apply', sFilter='all';
+let form={type:null,detail:'',addr:'',docs:{}};
+
+function renderChrome(){$('#roles').innerHTML=ROLES.map(r=>`<button class="role-btn ${r.id===state.role?'active':''}" data-role="${r.id}"><span class="em">${r.em}</span>${r.label}</button>`).join('');}
+function render(){renderChrome();const v={citizen:vCitizen,staff:vStaff,exec:vExec}[state.role];$('#main').innerHTML=`<div class="view">${v()}</div>`;bind();}
+
+/* ============ CITIZEN ============ */
+function vCitizen(){
+  const mine=DB.apps.filter(a=>a.applicant===ME||a._me);
+  const tabs=`<div class="seg"><button class="${cView==='apply'?'on':''}" data-cv="apply">➕ ยื่นคำขอใหม่</button><button class="${cView==='mine'?'on':''}" data-cv="mine">📑 คำขอของฉัน${mine.length?' ('+mine.length+')':''}</button></div>`;
+  return tabs+(cView==='apply'?vApply():vMine(mine));
+}
+function vApply(){
+  const pt=`<label class="fl">1. เลือกประเภทคำขอ</label><div class="pt-grid">${Object.entries(PT).map(([k,p])=>`<button class="pt ${form.type===k?'sel':''}" data-pt="${k}"><div class="pi">${p.icon}</div><div><div class="pn">${p.label}</div><div class="pd">${p.dept} · ค่าธรรมเนียม: ${p.fee}</div></div><div class="chk">✓</div></button>`).join('')}</div>`;
+  let rest='';
+  if(form.type){const p=PT[form.type];
+    const done=Object.values(form.docs).filter(Boolean).length, need=p.docs.length;
+    rest=`<label class="fl">2. ข้อมูลผู้ยื่นคำขอ</label>
+      <input type="text" id="fName" value="${ME}" />
+      <input type="text" id="fAddr" placeholder="ที่อยู่ / สถานที่" value="${esc(form.addr)}" style="margin-top:8px" />
+      <textarea id="fDetail" placeholder="รายละเอียดคำขอ" style="margin-top:8px">${esc(form.detail)}</textarea>
+      <label class="fl">3. แนบเอกสารประกอบ (${done}/${need})</label>
+      <div>${p.docs.map((d,i)=>{const ok=form.docs[i];return `<div class="docitem ${ok?'done':''}"><div class="di">${ok?'✅':'📎'}</div><div class="dn">${d}${ok?`<small>แนบแล้ว: ${esc(ok)}</small>`:''}</div><button class="btn ${ok?'btn-ghost':'btn-amber'} btn-sm ab" data-doc="${i}">${ok?'เปลี่ยน':'แนบไฟล์'}</button></div>`;}).join('')}</div>
+      <input type="file" id="docFile" hidden />
+      <button class="btn btn-primary" id="submitApp" style="margin-top:16px" ${done===need?'':'disabled'}>📨 ยื่นคำขอ</button>
+      ${done<need?'<div class="mini" style="text-align:center;margin-top:8px">กรุณาแนบเอกสารให้ครบก่อนยื่นคำขอ</div>':''}`;
+  }
+  return `<div class="card"><h3>📋 ยื่นคำขอออนไลน์</h3><div class="hint">ไม่ต้องเดินทางมายื่นเอกสารที่สำนักงาน</div>${pt}${rest}</div>`;
+}
+function vMine(mine){
+  if(!mine.length)return `<div class="empty"><div class="em">📑</div>ยังไม่มีคำขอ<br/><span class="mini">กด "ยื่นคำขอใหม่" เพื่อเริ่ม</span></div>`;
+  return mine.slice().sort((a,b)=>b.createdAt-a.createdAt).map(appCard).join('');
+}
+function appCard(a){
+  const p=PT[a.type],st=ST[a.status];
+  return `<div class="appcard"><div class="top"><div><div class="no">${a.no} · ${p.dept}</div><div class="tl">${p.icon} ${p.label}</div></div>
+    <span class="badge ${st.cls}"><span class="dot" style="background:${st.c}"></span>${st.t}</span></div>
+    ${a.detail?`<div class="mini" style="margin-top:3px">${esc(a.detail)}</div>`:''}
+    <div class="meta"><span>👤 ${esc(a.applicant)}</span><span>🕒 ยื่นเมื่อ ${fdate(a.createdAt)}</span></div>
+    <div class="steps">${a.updates.map(u=>`<div class="st"><span class="sd" style="background:${ST[u.s].c}"></span><div class="sw"><div class="stt">${ST[u.s].t}</div><div class="sm">${esc(u.n)} · ${fdate(u.at)} · ${esc(u.by)}</div></div></div>`).join('')}</div>
+    ${a.status==='issued'?`<button class="btn btn-green certBtn" data-id="${a.id}" style="margin-top:12px">📜 ดาวน์โหลดใบอนุญาต ${a.license.no}</button>`:''}
+    ${a.status==='need_docs'?`<button class="btn btn-amber resubBtn" data-id="${a.id}" style="margin-top:12px">📎 ส่งเอกสารเพิ่มเติม</button>`:''}
+  </div>`;
+}
+function submitApp(){
+  const p=PT[form.type];const id='e'+Date.now();const no='ES'+(69000+DB.apps.length+1);
+  const a={id,no,type:form.type,applicant:($('#fName').value||ME),addr:$('#fAddr').value,phone:'08x-xxx-xxxx',
+    detail:$('#fDetail').value,docs:p.docs.map((d,i)=>({name:d,attached:!!form.docs[i]})),
+    status:'submitted',createdAt:Date.now(),_me:true,
+    updates:[{s:'submitted',n:'รับคำขอเข้าระบบ รอเจ้าหน้าที่ตรวจสอบ',at:Date.now(),by:'ระบบ'}],license:null};
+  DB.apps.push(a);save(DB);
+  $('#modalBox').innerHTML=`<div class="ok-circle">📨</div><h3>ยื่นคำขอสำเร็จ</h3><div class="nobig">${no}</div>
+    <p>${p.icon} ${p.label}</p><p class="mini" style="margin-top:8px">เจ้าหน้าที่จะตรวจสอบและแจ้งผลผ่านระบบ · ติดตามได้ที่ "คำขอของฉัน"</p>
+    <button class="btn btn-primary" id="afterApp" style="margin-top:14px">ดูคำขอของฉัน</button>`;
+  $('#modal').classList.add('show');
+  form={type:null,detail:'',addr:'',docs:{}};
+}
+function showCert(id){
+  const a=DB.apps.find(x=>x.id===id);const p=PT[a.type];
+  $('#modalBox').innerHTML=`<h3 style="margin-bottom:4px">ใบอนุญาตดิจิทัล</h3>
+    <div class="cert"><div class="gov">องค์การบริหารส่วนตำบลบึงคำพร้อย</div><div class="seal">🏛️</div>
+      <div class="ct">${p.label}</div><div class="cno">เลขที่ใบอนุญาต ${a.license.no}</div>
+      <div class="cr"><span class="k">ผู้ได้รับอนุญาต</span><span class="v">${esc(a.applicant)}</span></div>
+      <div class="cr"><span class="k">สถานที่</span><span class="v">${esc(a.addr||'-')}</span></div>
+      <div class="cr"><span class="k">วันที่ออก</span><span class="v">${fdate(a.license.issuedAt)}</span></div>
+      ${a.license.expireAt?`<div class="cr"><span class="k">ใช้ได้ถึง</span><span class="v">${fdate(a.license.expireAt)}</span></div>`:''}
+      <div class="cr"><span class="k">อ้างอิงคำขอ</span><span class="v">${a.no}</span></div>
+      <div class="sign">ลงนามอิเล็กทรอนิกส์<b>นายกองค์การบริหารส่วนตำบลบึงคำพร้อย</b></div>
+    </div>
+    <button class="btn btn-primary" id="closeCert">เสร็จสิ้น</button>
+    <div class="mini" style="margin-top:8px">* เอกสารตัวอย่างเพื่อการสาธิต</div>`;
+  $('#modal').classList.add('show');
+}
+
+/* ============ STAFF ============ */
+function vStaff(){
+  const apps=DB.apps.slice();
+  const pend=apps.filter(a=>a.status==='submitted'||a.status==='reviewing').length;
+  let list=sFilter==='all'?apps:apps.filter(a=>a.status===sFilter);
+  list=list.sort((a,b)=>ORDER[a.status]-ORDER[b.status]||b.createdAt-a.createdAt);
+  const head=`<div class="card"><h3>🗂️ ระบบพิจารณาคำขอ</h3><div class="hint">ตรวจสอบเอกสาร และอนุมัติ/ออกใบอนุญาต · รอดำเนินการ ${pend} เรื่อง</div>
+    <div class="seg"><button class="${sFilter==='all'?'on':''}" data-s="all">ทั้งหมด (${apps.length})</button>
+      <button class="${sFilter==='submitted'?'on':''}" data-s="submitted">🟡 ใหม่</button>
+      <button class="${sFilter==='reviewing'?'on':''}" data-s="reviewing">🔵 ตรวจสอบ</button>
+      <button class="${sFilter==='issued'?'on':''}" data-s="issued">🟢 ออกแล้ว</button></div></div>`;
+  const body=list.length?list.map(staffCard).join(''):`<div class="empty"><div class="em">✅</div>ไม่มีคำขอในหมวดนี้</div>`;
+  return head+body;
+}
+function staffCard(a){
+  const p=PT[a.type],st=ST[a.status];
+  const docs=`<div style="margin-top:10px;border-top:1px dashed #efe9e3;padding-top:8px"><div class="mini" style="font-weight:600;margin-bottom:5px">เอกสารแนบ:</div>${a.docs.map(d=>`<div class="mini">${d.attached?'✅':'⬜'} ${d.name}</div>`).join('')}</div>`;
+  let act='';
+  if(a.status==='submitted')act=`<button class="btn btn-blue btn-sm actBtn" data-id="${a.id}" data-act="reviewing">เริ่มตรวจสอบ</button>`;
+  else if(a.status==='reviewing')act=`<div class="row" style="margin-top:4px"><button class="btn btn-green btn-sm actBtn" data-id="${a.id}" data-act="issued">อนุมัติ & ออกใบอนุญาต</button><button class="btn btn-amber btn-sm actBtn" data-id="${a.id}" data-act="need_docs">ขอเอกสารเพิ่ม</button><button class="btn btn-red btn-sm actBtn" data-id="${a.id}" data-act="rejected">ไม่อนุมัติ</button></div>`;
+  else if(a.status==='need_docs')act=`<button class="btn btn-blue btn-sm actBtn" data-id="${a.id}" data-act="reviewing">กลับมาตรวจสอบ</button>`;
+  return `<div class="appcard"><div class="top"><div><div class="no">${a.no} · ${p.dept}</div><div class="tl">${p.icon} ${p.label}</div></div>
+    <span class="badge ${st.cls}"><span class="dot" style="background:${st.c}"></span>${st.t}</span></div>
+    <div class="meta"><span>👤 ${esc(a.applicant)}</span><span>📍 ${esc(a.addr||'-')}</span><span>🕒 ${fdate(a.createdAt)}</span></div>
+    ${a.detail?`<div class="mini" style="margin-top:4px">${esc(a.detail)}</div>`:''}
+    ${docs}
+    ${a.license?`<div class="mini" style="margin-top:8px;color:var(--green-dark)">📜 ออกใบอนุญาตเลขที่ ${a.license.no} เมื่อ ${fdate(a.license.issuedAt)}</div>`:''}
+    ${act?`<div style="margin-top:10px">${act}</div>`:''}</div>`;
+}
+function doAct(id,act){
+  const a=DB.apps.find(x=>x.id===id);const notes={reviewing:'เริ่มตรวจสอบเอกสาร',issued:'อนุมัติและออกใบอนุญาต',need_docs:'ขอเอกสารเพิ่มเติมจากผู้ยื่น',rejected:'ไม่อนุมัติคำขอ'};
+  a.status=act;a.updates.push({s:act,n:notes[act],at:Date.now(),by:PT[a.type].dept});
+  if(act==='issued'&&!a.license){const v=PT[a.type].valid;a.license={no:licNo(a.type),issuedAt:Date.now(),expireAt:v?Date.now()+v*365*DAY:null};}
+  save(DB);toast('อัปเดตคำขอ '+a.no+' แล้ว');render();
+}
+
+/* ============ EXEC ============ */
+function vExec(){
+  const A=DB.apps;const total=A.length;
+  const issued=A.filter(a=>a.status==='issued').length;
+  const pend=A.filter(a=>['submitted','reviewing','need_docs'].includes(a.status)).length;
+  const rej=A.filter(a=>a.status==='rejected').length;
+  const decided=issued+rej;const apr=decided?Math.round(issued/decided*100):0;
+  const byType=Object.entries(PT).map(([k,p])=>({p,c:A.filter(a=>a.type===k).length})).filter(x=>x.c>0).sort((a,b)=>b.c-a.c);
+  const tmax=Math.max(1,...byType.map(x=>x.c));
+  return `<div class="card"><h3>📈 Dashboard คำขอ e-Service</h3>
+    <div class="kpis"><div class="kpi t"><div class="n">${total}</div><div class="l">คำขอทั้งหมด</div></div>
+    <div class="kpi i"><div class="n">${issued}</div><div class="l">ออกใบอนุญาต</div></div>
+    <div class="kpi p"><div class="n">${pend}</div><div class="l">รอพิจารณา</div></div>
+    <div class="kpi r"><div class="n">${rej}</div><div class="l">ไม่อนุมัติ</div></div></div>
+    <div class="bar-row"><span class="nm">อัตราการอนุมัติ</span><div class="bar-tk"><div class="bar-fl" style="width:${apr}%"></div></div><span class="vl">${apr}%</span></div>
+  </div>
+  <div class="card"><h3>🗂️ คำขอตามประเภท</h3>${byType.map(x=>`<div class="bar-row"><span class="nm">${x.p.icon} ${x.p.label}</span><div class="bar-tk"><div class="bar-fl" style="width:${x.c/tmax*100}%"></div></div><span class="vl">${x.c}</span></div>`).join('')}</div>
+  <div class="card"><h3>📊 สถานะคำขอ</h3>${Object.keys(ST).map(k=>{const c=A.filter(a=>a.status===k).length;return c?`<div class="row" style="justify-content:space-between;padding:7px 0;border-bottom:1px solid #f3efea"><span class="badge ${ST[k].cls}"><span class="dot" style="background:${ST[k].c}"></span>${ST[k].t}</span><b>${c}</b></div>`:'';}).join('')}</div>`;
+}
+
+/* ============ BIND ============ */
+let pendingDoc=null;
+function bind(){
+  document.querySelectorAll('[data-cv]').forEach(b=>b.onclick=()=>{cView=b.dataset.cv;render();});
+  document.querySelectorAll('[data-pt]').forEach(b=>b.onclick=()=>{if(form.type!==b.dataset.pt){form.type=b.dataset.pt;form.docs={};}render();});
+  // persist text inputs
+  ['fName','fAddr','fDetail'].forEach(idf=>{const el=$('#'+idf);if(el)el.oninput=()=>{if(idf==='fAddr')form.addr=el.value;if(idf==='fDetail')form.detail=el.value;};});
+  document.querySelectorAll('[data-doc]').forEach(b=>b.onclick=()=>{pendingDoc=b.dataset.doc;$('#docFile').click();});
+  const df=$('#docFile');if(df)df.onchange=()=>{if(df.files[0]&&pendingDoc!==null){const cur={};['fName','fAddr','fDetail'].forEach(()=>{});form.addr=$('#fAddr')?.value||form.addr;form.detail=$('#fDetail')?.value||form.detail;form.docs[pendingDoc]=df.files[0].name;render();}};
+  const sa=$('#submitApp');if(sa)sa.onclick=submitApp;
+  document.querySelectorAll('.certBtn').forEach(b=>b.onclick=()=>showCert(b.dataset.id));
+  document.querySelectorAll('.resubBtn').forEach(b=>b.onclick=()=>{const a=DB.apps.find(x=>x.id===b.dataset.id);a.status='reviewing';a.updates.push({s:'reviewing',n:'ผู้ยื่นส่งเอกสารเพิ่มเติม กลับเข้าสู่การตรวจสอบ',at:Date.now(),by:'ระบบ'});save(DB);toast('ส่งเอกสารเพิ่มเติมแล้ว');render();});
+  document.querySelectorAll('[data-s]').forEach(b=>b.onclick=()=>{sFilter=b.dataset.s;render();});
+  document.querySelectorAll('.actBtn').forEach(b=>b.onclick=()=>doAct(b.dataset.id,b.dataset.act));
+}
+$('#roles').onclick=e=>{const b=e.target.closest('[data-role]');if(!b)return;state.role=b.dataset.role;cView='apply';sFilter='all';render();};
+$('#modal').onclick=e=>{if(e.target.id==='afterApp'){$('#modal').classList.remove('show');cView='mine';render();return;}if(e.target.id==='closeCert'){$('#modal').classList.remove('show');return;}if(e.target===$('#modal'))$('#modal').classList.remove('show');};
+$('#resetBtn').onclick=()=>{if(confirm('รีเซ็ตข้อมูลตัวอย่าง e-Service กลับเป็นค่าเริ่มต้น?')){localStorage.removeItem(KEY);DB=load();toast('♻️ รีเซ็ตแล้ว');render();}};
+render();
+</script>
+</body>
+</html>
