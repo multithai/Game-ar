@@ -1,0 +1,310 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0" />
+<title>ระบบจองคิวออนไลน์ — อบต.บึงคำพร้อย Demo</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
+<style>
+  :root{
+    --ind:#6366f1;--ind-dark:#4338ca;--ind-soft:#eef2ff;
+    --green:#1f9d55;--green-dark:#15803d;--green-light:#dcf5e6;
+    --blue:#2563eb;--blue-soft:#e7efff;--amber:#f59e0b;--amber-soft:#fef4e2;
+    --red:#ef4444;--red-soft:#fde8e6;--ink:#13261b;--muted:#5c6b62;--bg:#eef0f7;--card:#fff;
+    --radius:16px;--shadow:0 8px 24px rgba(30,27,75,.08);--shadow-lg:0 18px 44px rgba(30,27,75,.16);
+  }
+  *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;}
+  body{font-family:'Prompt',system-ui,sans-serif;background:var(--bg);color:var(--ink);line-height:1.5;}
+  button,input,select{font-family:inherit;font-size:inherit;}
+  .app{max-width:920px;margin:0 auto;min-height:100vh;}
+  .topbar{position:sticky;top:0;z-index:30;background:linear-gradient(135deg,var(--ind-dark),var(--ind));color:#fff;padding:11px 16px;display:flex;align-items:center;gap:11px;box-shadow:0 4px 14px rgba(0,0,0,.12);}
+  .topbar .seal{width:36px;height:36px;border-radius:10px;background:rgba(255,255,255,.2);display:grid;place-items:center;font-size:19px;flex:none;}
+  .topbar .ttl{font-weight:700;font-size:14.5px;line-height:1.2;}
+  .topbar .ttl small{display:block;font-weight:400;font-size:10.5px;opacity:.85;}
+  .topbar .reset{margin-left:auto;background:rgba(255,255,255,.18);border:none;color:#fff;padding:7px 11px;border-radius:9px;font-size:12px;cursor:pointer;}
+  .nav2{display:flex;gap:8px;padding:8px 12px;background:#fff;font-size:12.5px;align-items:center;box-shadow:0 2px 8px rgba(0,0,0,.04);}
+  .nav2 a{color:var(--muted);text-decoration:none;padding:5px 10px;border-radius:8px;font-weight:600;}
+  .nav2 a:hover{background:var(--ind-soft);color:var(--ind-dark);}
+  .nav2 .sep{color:#cbd5cf;}
+  .roles{display:flex;gap:6px;padding:10px 12px;background:#fff;position:sticky;top:58px;z-index:25;box-shadow:0 2px 10px rgba(0,0,0,.04);overflow-x:auto;}
+  .role-btn{flex:1;min-width:104px;border:1px solid #dde1ee;background:#fff;color:var(--ink);padding:9px 8px;border-radius:11px;font-weight:600;font-size:13px;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:3px;transition:.18s;}
+  .role-btn .em{font-size:18px;}
+  .role-btn.active{background:var(--ind-dark);color:#fff;border-color:var(--ind-dark);box-shadow:0 6px 14px rgba(67,56,202,.25);}
+  main{padding:14px 12px 90px;}
+  .view{animation:fade .3s ease;}
+  @keyframes fade{from{opacity:0;transform:translateY(8px);}to{opacity:1;transform:translateY(0);}}
+  .card{background:var(--card);border-radius:var(--radius);box-shadow:var(--shadow);padding:18px;margin-bottom:14px;border:1px solid #eef0f7;}
+  .card h3{font-size:16px;font-weight:700;margin-bottom:4px;display:flex;align-items:center;gap:8px;}
+  .card .hint{font-size:12.5px;color:var(--muted);margin-bottom:12px;}
+  label.fl{display:block;font-size:13px;font-weight:600;margin:14px 0 8px;}
+  input[type=text]{width:100%;border:1.5px solid #dde1ee;border-radius:11px;padding:11px 13px;font-size:14px;background:#fbfbfe;}
+  input:focus{outline:none;border-color:var(--ind);background:#fff;}
+
+  .svc-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
+  .svc{border:1.5px solid #dde1ee;background:#fff;border-radius:13px;padding:14px;cursor:pointer;transition:.15s;text-align:left;}
+  .svc:hover{border-color:var(--ind);}
+  .svc.sel{border-color:var(--ind-dark);background:var(--ind-soft);box-shadow:0 6px 14px rgba(99,102,241,.18);}
+  .svc .si{font-size:24px;}
+  .svc .sn{font-weight:700;font-size:13.5px;margin-top:6px;}
+  .svc .sd{font-size:11px;color:var(--muted);}
+
+  .pills{display:flex;gap:8px;overflow-x:auto;padding-bottom:4px;}
+  .pill{white-space:nowrap;border:1.5px solid #dde1ee;background:#fff;border-radius:12px;padding:9px 13px;cursor:pointer;text-align:center;transition:.15s;flex:none;}
+  .pill.sel{border-color:var(--ind-dark);background:var(--ind-dark);color:#fff;}
+  .pill .pd{font-weight:700;font-size:14px;}
+  .pill .pm{font-size:10.5px;opacity:.9;}
+  .slots{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;}
+  .slot{border:1.5px solid #dde1ee;background:#fff;border-radius:10px;padding:10px 4px;text-align:center;cursor:pointer;font-weight:600;font-size:13px;transition:.15s;}
+  .slot .av{display:block;font-size:9.5px;font-weight:500;color:var(--green-dark);margin-top:2px;}
+  .slot.sel{border-color:var(--ind-dark);background:var(--ind-dark);color:#fff;}
+  .slot.full{opacity:.4;cursor:not-allowed;}
+  .slot.full .av{color:var(--red);}
+
+  .btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;border:none;border-radius:11px;padding:13px 18px;font-weight:600;font-size:14px;cursor:pointer;transition:.18s;}
+  .btn-primary{background:var(--ind);color:#fff;width:100%;box-shadow:0 8px 18px rgba(99,102,241,.32);}
+  .btn-primary:active{transform:scale(.98);}
+  .btn-primary:disabled{opacity:.45;box-shadow:none;}
+  .btn-ghost{background:#fff;border:1.5px solid #dde1ee;color:var(--ink);}
+  .btn-sm{padding:8px 12px;font-size:12.5px;border-radius:9px;}
+  .btn-red{background:var(--red);color:#fff;}
+  .btn-green{background:var(--green);color:#fff;}
+
+  .badge{display:inline-flex;align-items:center;gap:6px;padding:5px 11px;border-radius:999px;font-size:12px;font-weight:700;}
+  .b-waiting{background:var(--amber-soft);color:#b45309;}
+  .b-serving{background:var(--blue-soft);color:#1d4ed8;}
+  .b-done{background:var(--green-light);color:var(--green-dark);}
+  .b-noshow{background:var(--red-soft);color:#b91c1c;}
+  .b-cancelled{background:#eef0f3;color:#64748b;}
+  .dot{width:8px;height:8px;border-radius:50%;}
+
+  .ticket{background:linear-gradient(135deg,var(--ind-dark),var(--ind));color:#fff;border-radius:16px;padding:18px;margin-bottom:12px;position:relative;overflow:hidden;}
+  .ticket .qn{font-size:40px;font-weight:800;line-height:1;letter-spacing:1px;}
+  .ticket .qs{font-size:13px;opacity:.92;margin-top:2px;}
+  .ticket .qm{font-size:12px;opacity:.85;margin-top:10px;display:flex;flex-wrap:wrap;gap:12px;}
+  .ticket .ahead{position:absolute;top:14px;right:16px;text-align:center;background:rgba(255,255,255,.16);border-radius:11px;padding:8px 12px;}
+  .ticket .ahead b{font-size:20px;display:block;}
+  .ticket .ahead span{font-size:10px;opacity:.9;}
+
+  .empty{text-align:center;padding:40px 20px;color:var(--muted);}
+  .empty .em{font-size:42px;}
+  .mini{font-size:11px;color:var(--muted);}
+  .seg{display:flex;gap:6px;margin-bottom:12px;overflow-x:auto;}
+  .seg button{white-space:nowrap;border:1.5px solid #dde1ee;background:#fff;color:var(--muted);padding:7px 13px;border-radius:999px;font-size:12.5px;font-weight:600;cursor:pointer;}
+  .seg button.on{background:var(--ink);color:#fff;border-color:var(--ink);}
+
+  .now-serving{background:#fff;border:2px solid var(--ind);border-radius:16px;padding:18px;text-align:center;margin-bottom:14px;}
+  .now-serving .lbl{font-size:12px;color:var(--muted);font-weight:600;}
+  .now-serving .big{font-size:46px;font-weight:800;color:var(--ind-dark);line-height:1.05;}
+  .now-serving .none{font-size:18px;color:var(--muted);padding:8px 0;}
+  .qrow{display:flex;align-items:center;gap:12px;padding:11px 0;border-bottom:1px solid #f0f1f6;}
+  .qrow:last-child{border:none;}
+  .qrow .num{font-size:18px;font-weight:800;width:58px;flex:none;color:var(--ind-dark);}
+  .qrow .info{flex:1;min-width:0;}
+  .qrow .info .nm{font-weight:600;font-size:14px;}
+  .qrow .info .sb{font-size:11.5px;color:var(--muted);}
+
+  .kpis{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:14px;}
+  .kpi{border-radius:13px;padding:13px 10px;color:#fff;text-align:center;}
+  .kpi.t{background:linear-gradient(135deg,#6366f1,#4338ca);}
+  .kpi.s{background:linear-gradient(135deg,#1f9d55,#15803d);}
+  .kpi.w{background:linear-gradient(135deg,#f59e0b,#d97706);}
+  .kpi.n{background:linear-gradient(135deg,#ef4444,#b91c1c);}
+  .kpi .n{font-size:24px;font-weight:800;line-height:1;}
+  .kpi .l{font-size:10.5px;opacity:.92;margin-top:4px;}
+  .bar-row{display:flex;align-items:center;gap:10px;margin-bottom:11px;font-size:13px;}
+  .bar-row .nm{width:140px;flex:none;font-weight:500;display:flex;align-items:center;gap:6px;font-size:12.5px;}
+  .bar-tk{flex:1;background:#eef0f7;border-radius:999px;height:10px;overflow:hidden;}
+  .bar-fl{height:100%;border-radius:999px;background:linear-gradient(90deg,#818cf8,#4338ca);}
+  .bar-row .vl{width:30px;text-align:right;color:var(--muted);font-weight:700;font-size:12px;}
+
+  .toast{position:fixed;left:50%;bottom:26px;transform:translateX(-50%) translateY(40px);background:var(--ind-dark);color:#fff;padding:13px 20px;border-radius:12px;font-size:14px;font-weight:600;box-shadow:var(--shadow-lg);z-index:100;opacity:0;transition:.3s;max-width:90%;text-align:center;}
+  .toast.show{opacity:1;transform:translateX(-50%) translateY(0);}
+  .modal{position:fixed;inset:0;background:rgba(20,18,50,.55);display:none;align-items:center;justify-content:center;z-index:90;padding:18px;}
+  .modal.show{display:flex;}
+  .modal .box{background:#fff;border-radius:20px;padding:24px;max-width:340px;width:100%;text-align:center;animation:pop .3s ease;}
+  @keyframes pop{from{transform:scale(.85);opacity:0;}to{transform:scale(1);opacity:1;}}
+  .ok-circle{width:60px;height:60px;border-radius:50%;background:var(--ind-soft);display:grid;place-items:center;font-size:30px;margin:0 auto 12px;}
+  .modal h3{font-size:18px;font-weight:700;}
+  .modal .qbig{font-size:48px;font-weight:800;color:var(--ind-dark);margin:8px 0 2px;letter-spacing:1px;}
+  .modal p{color:var(--muted);font-size:13px;margin:2px 0;}
+</style>
+</head>
+<body>
+<div class="app">
+  <div class="topbar">
+    <div class="seal">📅</div>
+    <div class="ttl">ระบบจองคิวออนไลน์ <small>อบต.บึงคำพร้อย · Demo</small></div>
+    <button class="reset" id="resetBtn">↺ รีเซ็ต</button>
+  </div>
+  <div class="nav2"><a href="../">🏠 ระบบหลัก</a><span class="sep">·</span><a href="../billing/">💰 ชำระเงิน</a><span class="sep">·</span><a href="../../">📊 หน้านำเสนอ</a></div>
+  <div class="roles" id="roles"></div>
+  <main id="main"></main>
+</div>
+<div class="toast" id="toast"></div>
+<div class="modal" id="modal"><div class="box" id="modalBox"></div></div>
+
+<script>
+/* ============ DATA ============ */
+const KEY='sm_queue_v1';
+const ME='นายสมชาย ใจดี';
+const SERVICES={
+  doc:{label:'ขอเอกสาร/ทะเบียน',dept:'สำนักปลัด',icon:'📄',prefix:'A'},
+  tax:{label:'ชำระภาษี/รายได้',dept:'กองคลัง',icon:'💰',prefix:'B'},
+  build:{label:'ขออนุญาตก่อสร้าง',dept:'กองช่าง',icon:'🏗️',prefix:'C'},
+  welfare:{label:'สวัสดิการ/เบี้ยยังชีพ',dept:'กองสวัสดิการ',icon:'🤝',prefix:'D'},
+  health:{label:'งานสาธารณสุข',dept:'กองสาธารณสุข',icon:'🏥',prefix:'E'},
+};
+const SLOTS=['08:30','09:00','09:30','10:00','10:30','11:00','11:30','13:00','13:30','14:00','14:30','15:00','15:30'];
+const CAP=3;
+const STL={waiting:{t:'รอเรียก',cls:'b-waiting',c:'#f59e0b'},serving:{t:'กำลังให้บริการ',cls:'b-serving',c:'#2563eb'},done:{t:'เสร็จสิ้น',cls:'b-done',c:'#1f9d55'},noshow:{t:'ไม่มาตามคิว',cls:'b-noshow',c:'#ef4444'},cancelled:{t:'ยกเลิก',cls:'b-cancelled',c:'#94a3b8'}};
+
+function ymd(d){return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');}
+function today(){return ymd(new Date());}
+function nextDays(n){const a=[];for(let i=0;i<n;i++){const d=new Date();d.setDate(d.getDate()+i);a.push(d);}return a;}
+const THDAY=['อา','จ','อ','พ','พฤ','ศ','ส'],THMON=['ม.ค.','ก.พ.','มี.ค.','เม.ย.','พ.ค.','มิ.ย.','ก.ค.','ส.ค.','ก.ย.','ต.ค.','พ.ย.','ธ.ค.'];
+function dlabel(d){return THDAY[d.getDay()]+' '+d.getDate()+' '+THMON[d.getMonth()];}
+
+function seed(){
+  const t=today();let id=0;const B=[];
+  const add=(svc,slot,name,status)=>{id++;const seq=B.filter(b=>b.service===svc&&b.date===t&&b.status!=='cancelled').length+1;
+    B.push({id:'q'+id,no:SERVICES[svc].prefix+String(seq).padStart(3,'0'),service:svc,date:t,slot,name,phone:'08x-xxx-'+String(1000+id).slice(-4),status,createdAt:Date.now()-id*60000});};
+  add('doc','08:30','นางสาวพิมพ์ใจ ดีงาม','done');
+  add('doc','09:00','นายอนุชา ตั้งใจ','serving');
+  add('doc','09:30','นางมาลี ศรีสุข','waiting');
+  add('doc','10:00','นายวีระ กล้าหาญ','waiting');
+  add('tax','09:00','ร้านค้าชุมชน หมู่ 5','done');
+  add('tax','09:30','นายมานพ ทองคำ','serving');
+  add('tax','10:00','นางวิไล สุขใจ','waiting');
+  add('build','10:00','บริษัท บ้านสวย จำกัด','waiting');
+  add('welfare','08:30','นางสมหญิง รักดี','done');
+  add('welfare','09:00','นายประสิทธิ์ พูลผล','noshow');
+  add('welfare','09:30','นางบุญมี ใจบุญ','waiting');
+  add('health','10:30','นายสมศักดิ์ แข็งแรง','waiting');
+  return {bookings:B};
+}
+function load(){try{const d=JSON.parse(localStorage.getItem(KEY));if(d&&d.bookings)return d;}catch(e){}const s=seed();save(s);return s;}
+function save(d){localStorage.setItem(KEY,JSON.stringify(d));}
+let DB=load();
+
+/* ============ HELPERS ============ */
+const $=s=>document.querySelector(s);
+function toast(m){const t=$('#toast');t.textContent=m;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),2200);}
+function esc(s){return(s||'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));}
+function slotCount(svc,date,slot){return DB.bookings.filter(b=>b.service===svc&&b.date===date&&b.slot===slot&&b.status!=='cancelled').length;}
+function nextNo(svc,date){const seq=DB.bookings.filter(b=>b.service===svc&&b.date===date&&b.status!=='cancelled').length+1;return SERVICES[svc].prefix+String(seq).padStart(3,'0');}
+function aheadOf(bk){return DB.bookings.filter(b=>b.service===bk.service&&b.date===bk.date&&b.status==='waiting'&&b.createdAt<bk.createdAt).length;}
+
+/* ============ STATE ============ */
+const ROLES=[{id:'citizen',label:'ประชาชน',em:'👨‍👩‍👧‍👦'},{id:'staff',label:'เจ้าหน้าที่',em:'🪧'},{id:'exec',label:'ผู้บริหาร',em:'📈'}];
+let state={role:'citizen'};
+let book={service:null,date:today(),slot:null};
+let staffSvc='doc', cView='book';
+
+function renderChrome(){$('#roles').innerHTML=ROLES.map(r=>`<button class="role-btn ${r.id===state.role?'active':''}" data-role="${r.id}"><span class="em">${r.em}</span>${r.label}</button>`).join('');}
+function render(){renderChrome();const v={citizen:vCitizen,staff:vStaff,exec:vExec}[state.role];$('#main').innerHTML=`<div class="view">${v()}</div>`;bind();}
+
+/* ============ CITIZEN ============ */
+function vCitizen(){
+  const mine=DB.bookings.filter(b=>b.name===ME);
+  const tabs=`<div class="seg"><button class="${cView==='book'?'on':''}" data-cv="book">➕ จองคิวใหม่</button><button class="${cView==='mine'?'on':''}" data-cv="mine">🎫 คิวของฉัน${mine.length?' ('+mine.length+')':''}</button></div>`;
+  return tabs+(cView==='book'?vBook():vMine(mine));
+}
+function vBook(){
+  const days=nextDays(7);
+  const svc=`<label class="fl">1. เลือกบริการ</label><div class="svc-grid">${Object.entries(SERVICES).map(([k,s])=>`<button class="svc ${book.service===k?'sel':''}" data-svc="${k}"><div class="si">${s.icon}</div><div class="sn">${s.label}</div><div class="sd">${s.dept}</div></button>`).join('')}</div>`;
+  const date=`<label class="fl">2. เลือกวันที่</label><div class="pills">${days.map(d=>{const v=ymd(d);return `<button class="pill ${book.date===v?'sel':''}" data-date="${v}"><div class="pd">${d.getDate()} ${THMON[d.getMonth()]}</div><div class="pm">${THDAY[d.getDay()]}${v===today()?' · วันนี้':''}</div></button>`;}).join('')}</div>`;
+  let slot='';
+  if(book.service){slot=`<label class="fl">3. เลือกช่วงเวลา</label><div class="slots">${SLOTS.map(s=>{const c=slotCount(book.service,book.date,s);const full=c>=CAP;return `<button class="slot ${book.slot===s?'sel':''} ${full?'full':''}" data-slot="${s}" ${full?'disabled':''}>${s}<span class="av">${full?'เต็ม':'ว่าง '+(CAP-c)}</span></button>`;}).join('')}</div>`;}
+  const ready=book.service&&book.slot;
+  const preview=ready?`<div class="card" style="margin-top:14px;background:var(--ind-soft);border-color:#c7d2fe"><div style="font-size:13px"><b>สรุป:</b> ${SERVICES[book.service].icon} ${SERVICES[book.service].label} · ${dlabel(new Date(book.date))} · ${book.slot} น.</div><div class="mini" style="margin-top:4px">คิวถัดไปของคุณจะเป็น <b style="color:var(--ind-dark)">${nextNo(book.service,book.date)}</b></div></div>`:'';
+  return `<div class="card"><h3>📅 จองคิวรับบริการล่วงหน้า</h3><div class="hint">ไม่ต้องรอคิวนาน เลือกวัน-เวลาที่สะดวก</div>
+    ${svc}${date}${slot}${preview}
+    <button class="btn btn-primary" id="confirmBook" style="margin-top:16px" ${ready?'':'disabled'}>🎫 ยืนยันการจองคิว</button></div>`;
+}
+function vMine(mine){
+  if(!mine.length)return `<div class="empty"><div class="em">🎫</div>ยังไม่มีคิวที่จอง<br/><span class="mini">กด "จองคิวใหม่" เพื่อเริ่ม</span></div>`;
+  return mine.slice().sort((a,b)=>b.createdAt-a.createdAt).map(b=>{
+    const s=SERVICES[b.service],st=STL[b.status];const active=b.status==='waiting'||b.status==='serving';
+    const ahead=b.status==='waiting'?aheadOf(b):0;
+    return `<div class="ticket" style="${active?'':'opacity:.7;background:linear-gradient(135deg,#64748b,#475569)'}">
+      ${b.status==='waiting'?`<div class="ahead"><b>${ahead}</b><span>คิวก่อนหน้า</span></div>`:''}
+      <div class="qn">${b.no}</div><div class="qs">${s.icon} ${s.label} · ${s.dept}</div>
+      <div class="qm"><span>📆 ${dlabel(new Date(b.date))}</span><span>🕒 ${b.slot} น.</span><span class="badge ${st.cls}" style="background:rgba(255,255,255,.2);color:#fff"><span class="dot" style="background:#fff"></span>${st.t}</span></div>
+      ${b.status==='waiting'?`<button class="btn btn-ghost btn-sm cancelBtn" data-id="${b.id}" style="margin-top:12px;background:rgba(255,255,255,.16);border-color:rgba(255,255,255,.3);color:#fff">ยกเลิกคิว</button>`:''}
+    </div>`;
+  }).join('');
+}
+function confirmBook(){
+  const no=nextNo(book.service,book.date);
+  const bk={id:'q'+Date.now(),no,service:book.service,date:book.date,slot:book.slot,name:ME,phone:'08x-xxx-xxxx',status:'waiting',createdAt:Date.now()};
+  DB.bookings.push(bk);save(DB);
+  const s=SERVICES[book.service];
+  $('#modalBox').innerHTML=`<div class="ok-circle">🎫</div><h3>จองคิวสำเร็จ</h3><div class="qbig">${no}</div>
+    <p>${s.icon} ${s.label}</p><p>📆 ${dlabel(new Date(book.date))} · 🕒 ${book.slot} น.</p>
+    <p class="mini" style="margin-top:8px">กรุณามาก่อนเวลานัด 10 นาที · ระบบจะแจ้งเตือนเมื่อใกล้ถึงคิว</p>
+    <button class="btn btn-primary" id="afterBook" style="margin-top:14px">ดูคิวของฉัน</button>`;
+  $('#modal').classList.add('show');
+  book={service:null,date:today(),slot:null};
+}
+
+/* ============ STAFF ============ */
+function vStaff(){
+  const t=today();
+  const head=`<div class="card"><h3>🪧 เคาน์เตอร์บริการ <span class="mini" style="font-weight:400">· ${dlabel(new Date())}</span></h3>
+    <div class="hint">เลือกเคาน์เตอร์ แล้วกด "เรียกคิวถัดไป"</div>
+    <div class="pills">${Object.entries(SERVICES).map(([k,s])=>`<button class="pill ${staffSvc===k?'sel':''}" data-ssvc="${k}"><div class="pd">${s.icon}</div><div class="pm">${s.dept}</div></button>`).join('')}</div></div>`;
+  const list=DB.bookings.filter(b=>b.service===staffSvc&&b.date===t);
+  const serving=list.filter(b=>b.status==='serving');
+  const waiting=list.filter(b=>b.status==='waiting').sort((a,b)=>a.createdAt-b.createdAt);
+  const nowS=`<div class="now-serving"><div class="lbl">กำลังเรียก — ${SERVICES[staffSvc].label}</div>
+    ${serving.length?serving.map(b=>`<div class="big">${b.no}</div><div class="mini">${esc(b.name)}</div>`).join(''):'<div class="none">— ว่าง —</div>'}
+    <button class="btn btn-primary callBtn" style="margin-top:12px" ${waiting.length?'':'disabled'}>📢 เรียกคิวถัดไป${waiting.length?' ('+waiting[0].no+')':''}</button></div>`;
+  const rows=list.length?list.slice().sort((a,b)=>{const o={serving:0,waiting:1,done:2,noshow:3,cancelled:4};return o[a.status]-o[b.status]||a.createdAt-b.createdAt;}).map(b=>{
+    const st=STL[b.status];
+    const act=b.status==='serving'?`<button class="btn btn-green btn-sm doneBtn" data-id="${b.id}">เสร็จ</button>`:
+      b.status==='waiting'?`<button class="btn btn-ghost btn-sm noshowBtn" data-id="${b.id}">ไม่มา</button>`:'';
+    return `<div class="qrow"><div class="num">${b.no}</div><div class="info"><div class="nm">${esc(b.name)}</div><div class="sb">🕒 ${b.slot} · ${b.phone}</div><div style="margin-top:4px"><span class="badge ${st.cls}"><span class="dot" style="background:${st.c}"></span>${st.t}</span></div></div>${act}</div>`;
+  }).join(''):`<div class="empty"><div class="em">📭</div>ยังไม่มีคิววันนี้</div>`;
+  return head+nowS+`<div class="card"><h3>📋 คิวทั้งหมดวันนี้ (${list.length})</h3>${rows}</div>`;
+}
+
+/* ============ EXEC ============ */
+function vExec(){
+  const t=today();const tb=DB.bookings.filter(b=>b.date===t);
+  const total=tb.length,done=tb.filter(b=>b.status==='done').length,wait=tb.filter(b=>b.status==='waiting').length,ns=tb.filter(b=>b.status==='noshow').length;
+  const nsRate=total?Math.round(ns/total*100):0;
+  const bySvc=Object.entries(SERVICES).map(([k,s])=>({s,c:tb.filter(b=>b.service===k).length})).filter(x=>x.c>0).sort((a,b)=>b.c-a.c);
+  const smax=Math.max(1,...bySvc.map(x=>x.c));
+  const bySlot=SLOTS.map(sl=>({sl,c:tb.filter(b=>b.slot===sl).length})).filter(x=>x.c>0);
+  const slmax=Math.max(1,...bySlot.map(x=>x.c));
+  return `<div class="card"><h3>📈 Dashboard คิวบริการ <span class="mini" style="font-weight:400">· วันนี้</span></h3>
+    <div class="kpis"><div class="kpi t"><div class="n">${total}</div><div class="l">จองทั้งหมด</div></div>
+    <div class="kpi s"><div class="n">${done}</div><div class="l">รับบริการแล้ว</div></div>
+    <div class="kpi w"><div class="n">${wait}</div><div class="l">รอเรียก</div></div>
+    <div class="kpi n"><div class="n">${nsRate}%</div><div class="l">ไม่มาตามคิว</div></div></div></div>
+  <div class="card"><h3>🗂️ ปริมาณคิวตามบริการ</h3>${bySvc.map(x=>`<div class="bar-row"><span class="nm">${x.s.icon} ${x.s.dept}</span><div class="bar-tk"><div class="bar-fl" style="width:${x.c/smax*100}%"></div></div><span class="vl">${x.c}</span></div>`).join('')}</div>
+  <div class="card"><h3>⏰ ช่วงเวลาที่คนจองมาก</h3>${bySlot.map(x=>`<div class="bar-row"><span class="nm">${x.sl} น.</span><div class="bar-tk"><div class="bar-fl" style="width:${x.c/slmax*100}%"></div></div><span class="vl">${x.c}</span></div>`).join('')}<div class="mini">ใช้วางแผนกำลังเจ้าหน้าที่ในช่วงพีค</div></div>`;
+}
+
+/* ============ BIND ============ */
+function bind(){
+  document.querySelectorAll('[data-cv]').forEach(b=>b.onclick=()=>{cView=b.dataset.cv;render();});
+  document.querySelectorAll('[data-svc]').forEach(b=>b.onclick=()=>{book.service=b.dataset.svc;book.slot=null;render();});
+  document.querySelectorAll('[data-date]').forEach(b=>b.onclick=()=>{book.date=b.dataset.date;book.slot=null;render();});
+  document.querySelectorAll('.slot:not(.full)').forEach(b=>b.onclick=()=>{book.slot=b.dataset.slot;render();});
+  const cb=$('#confirmBook');if(cb)cb.onclick=confirmBook;
+  document.querySelectorAll('.cancelBtn').forEach(b=>b.onclick=()=>{if(confirm('ยกเลิกคิวนี้?')){const x=DB.bookings.find(z=>z.id===b.dataset.id);x.status='cancelled';save(DB);toast('ยกเลิกคิวแล้ว');render();}});
+  document.querySelectorAll('[data-ssvc]').forEach(b=>b.onclick=()=>{staffSvc=b.dataset.ssvc;render();});
+  const call=document.querySelector('.callBtn');if(call)call.onclick=()=>{const t=today();const w=DB.bookings.filter(b=>b.service===staffSvc&&b.date===t&&b.status==='waiting').sort((a,b)=>a.createdAt-b.createdAt);if(!w.length)return;w[0].status='serving';w[0].calledAt=Date.now();save(DB);toast('📢 เรียกคิว '+w[0].no);render();};
+  document.querySelectorAll('.doneBtn').forEach(b=>b.onclick=()=>{const x=DB.bookings.find(z=>z.id===b.dataset.id);x.status='done';save(DB);toast('✅ เสร็จสิ้น '+x.no);render();});
+  document.querySelectorAll('.noshowBtn').forEach(b=>b.onclick=()=>{const x=DB.bookings.find(z=>z.id===b.dataset.id);x.status='noshow';save(DB);toast('บันทึก: ไม่มาตามคิว');render();});
+}
+$('#roles').onclick=e=>{const b=e.target.closest('[data-role]');if(!b)return;state.role=b.dataset.role;cView='book';render();};
+$('#modal').onclick=e=>{if(e.target.id==='afterBook'){$('#modal').classList.remove('show');cView='mine';render();return;}if(e.target===$('#modal')){$('#modal').classList.remove('show');render();}};
+$('#resetBtn').onclick=()=>{if(confirm('รีเซ็ตข้อมูลตัวอย่างคิวกลับเป็นค่าเริ่มต้น?')){localStorage.removeItem(KEY);DB=load();toast('♻️ รีเซ็ตแล้ว');render();}};
+render();
+</script>
+</body>
+</html>
