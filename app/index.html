@@ -1,0 +1,472 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0" />
+<title>ระบบ Demo — LINE OA Smart Municipality อบต.บึงคำพร้อย</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
+<style>
+  :root{
+    --green:#1f9d55;--green-dark:#15803d;--green-light:#dcf5e6;--green-soft:#eefaf2;
+    --line:#06c755;--blue:#2563eb;--blue-soft:#e7efff;--amber:#f59e0b;--amber-soft:#fef4e2;
+    --red:#ef4444;--red-soft:#fde8e6;--ink:#13261b;--muted:#5c6b62;--bg:#eef3ef;--card:#fff;
+    --radius:16px;--shadow:0 8px 24px rgba(18,52,33,.08);--shadow-lg:0 18px 44px rgba(18,52,33,.14);
+  }
+  *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;}
+  body{font-family:'Prompt',system-ui,sans-serif;background:var(--bg);color:var(--ink);line-height:1.5;}
+  button,input,select,textarea{font-family:inherit;font-size:inherit;}
+  .app{max-width:920px;margin:0 auto;min-height:100vh;background:var(--bg);}
+
+  /* top bar */
+  .topbar{position:sticky;top:0;z-index:30;background:linear-gradient(135deg,var(--green-dark),var(--line));color:#fff;padding:12px 16px;display:flex;align-items:center;gap:12px;box-shadow:0 4px 14px rgba(0,0,0,.12);}
+  .topbar .seal{width:38px;height:38px;border-radius:10px;background:rgba(255,255,255,.2);display:grid;place-items:center;font-size:20px;flex:none;}
+  .topbar .ttl{font-weight:700;font-size:15px;line-height:1.2;}
+  .topbar .ttl small{display:block;font-weight:400;font-size:11px;opacity:.85;}
+  .topbar .reset{margin-left:auto;background:rgba(255,255,255,.18);border:none;color:#fff;padding:7px 12px;border-radius:9px;font-size:12px;cursor:pointer;font-weight:500;}
+  .topbar .reset:active{transform:scale(.95);}
+
+  /* role switcher */
+  .roles{display:flex;gap:6px;padding:10px 12px;background:#fff;position:sticky;top:62px;z-index:25;box-shadow:0 2px 10px rgba(0,0,0,.04);overflow-x:auto;}
+  .role-btn{flex:1;min-width:104px;border:1px solid #dde8e1;background:#fff;color:var(--ink);padding:9px 8px;border-radius:11px;font-weight:600;font-size:13px;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:3px;transition:.18s;}
+  .role-btn .em{font-size:18px;}
+  .role-btn.active{background:var(--green-dark);color:#fff;border-color:var(--green-dark);box-shadow:0 6px 14px rgba(21,128,61,.25);}
+
+  /* sub tabs */
+  .subtabs{display:flex;gap:4px;padding:10px 12px 0;overflow-x:auto;}
+  .subtab{white-space:nowrap;border:none;background:transparent;color:var(--muted);padding:8px 14px;border-radius:999px;font-weight:600;font-size:13.5px;cursor:pointer;}
+  .subtab.active{background:var(--green-light);color:var(--green-dark);}
+
+  main{padding:14px 12px 90px;}
+  .view{animation:fade .3s ease;}
+  @keyframes fade{from{opacity:0;transform:translateY(8px);}to{opacity:1;transform:translateY(0);}}
+
+  .card{background:var(--card);border-radius:var(--radius);box-shadow:var(--shadow);padding:18px;margin-bottom:14px;border:1px solid #eef4f0;}
+  .card h3{font-size:16px;font-weight:700;margin-bottom:4px;display:flex;align-items:center;gap:8px;}
+  .card .hint{font-size:12.5px;color:var(--muted);margin-bottom:14px;}
+  label.fl{display:block;font-size:13px;font-weight:600;margin:14px 0 7px;}
+  input[type=text],textarea,select{width:100%;border:1.5px solid #dde8e1;border-radius:11px;padding:11px 13px;font-size:14px;background:#fbfdfb;transition:.15s;}
+  input:focus,textarea:focus,select:focus{outline:none;border-color:var(--line);background:#fff;}
+  textarea{resize:vertical;min-height:80px;}
+
+  .chips{display:flex;flex-wrap:wrap;gap:8px;}
+  .chip{border:1.5px solid #dde8e1;background:#fff;border-radius:999px;padding:9px 15px;font-size:13.5px;font-weight:500;cursor:pointer;display:flex;align-items:center;gap:7px;transition:.15s;}
+  .chip.sel{background:var(--green-dark);color:#fff;border-color:var(--green-dark);}
+
+  .btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;border:none;border-radius:11px;padding:13px 18px;font-weight:600;font-size:14.5px;cursor:pointer;transition:.18s;}
+  .btn-primary{background:var(--line);color:#fff;width:100%;box-shadow:0 8px 18px rgba(6,199,85,.3);}
+  .btn-primary:active{transform:scale(.98);}
+  .btn-ghost{background:#fff;border:1.5px solid #dde8e1;color:var(--ink);}
+  .btn-sm{padding:8px 12px;font-size:12.5px;border-radius:9px;}
+  .row{display:flex;gap:8px;flex-wrap:wrap;}
+
+  .photo-pick{border:2px dashed #cfe0d6;border-radius:12px;padding:18px;text-align:center;color:var(--muted);font-size:13px;cursor:pointer;background:#fbfdfb;}
+  .photo-pick.has{padding:0;border-style:solid;overflow:hidden;}
+  .photo-pick img{width:100%;display:block;}
+  .gps-box{display:flex;gap:8px;align-items:center;}
+  .gps-status{font-size:12.5px;color:var(--muted);margin-top:7px;}
+  .gps-status.ok{color:var(--green-dark);font-weight:600;}
+
+  /* status badges */
+  .badge{display:inline-flex;align-items:center;gap:6px;padding:5px 11px;border-radius:999px;font-size:12px;font-weight:700;}
+  .b-received{background:var(--amber-soft);color:#b45309;}
+  .b-in_progress{background:var(--blue-soft);color:#1d4ed8;}
+  .b-done{background:var(--green-light);color:var(--green-dark);}
+  .dot{width:8px;height:8px;border-radius:50%;}
+
+  .req{background:#fff;border:1px solid #eef4f0;border-radius:14px;padding:14px;margin-bottom:12px;box-shadow:var(--shadow);}
+  .req .top{display:flex;justify-content:space-between;align-items:flex-start;gap:10px;}
+  .req .tno{font-size:11.5px;color:var(--muted);font-weight:600;letter-spacing:.3px;}
+  .req .ttl{font-weight:700;font-size:15px;margin:2px 0;}
+  .req .meta{font-size:12.5px;color:var(--muted);display:flex;flex-wrap:wrap;gap:10px;margin-top:6px;}
+  .req .meta a{color:var(--blue);text-decoration:none;}
+  .req img.ph{width:100%;border-radius:10px;margin-top:10px;}
+  .timeline{margin-top:12px;border-top:1px dashed #e4efe8;padding-top:10px;display:flex;flex-direction:column;gap:9px;}
+  .tl{display:flex;gap:10px;font-size:12.5px;}
+  .tl .tdot{width:10px;height:10px;border-radius:50%;margin-top:4px;flex:none;}
+  .tl .tw{flex:1;}
+  .tl .tt{font-weight:600;}
+  .tl .tm{color:var(--muted);}
+
+  .empty{text-align:center;padding:40px 20px;color:var(--muted);}
+  .empty .em{font-size:42px;}
+
+  /* dashboard */
+  .kpis{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:14px;}
+  .kpi{border-radius:14px;padding:15px;color:#fff;}
+  .kpi.t{background:linear-gradient(135deg,#2563eb,#1e40af);}
+  .kpi.d{background:linear-gradient(135deg,#1f9d55,#15803d);}
+  .kpi.p{background:linear-gradient(135deg,#f59e0b,#d97706);}
+  .kpi .n{font-size:30px;font-weight:800;line-height:1;}
+  .kpi .l{font-size:11.5px;opacity:.92;margin-top:5px;}
+  .bar-row{display:flex;align-items:center;gap:10px;margin-bottom:11px;font-size:13px;}
+  .bar-row .nm{width:104px;flex:none;font-weight:500;}
+  .bar-tk{flex:1;background:#eef4f0;border-radius:999px;height:10px;overflow:hidden;}
+  .bar-fl{height:100%;border-radius:999px;background:linear-gradient(90deg,var(--line),var(--green-dark));}
+  .bar-row .vl{width:30px;text-align:right;color:var(--muted);font-weight:700;font-size:12px;}
+  .donut-wrap{display:flex;align-items:center;gap:18px;flex-wrap:wrap;}
+  .donut{width:140px;height:140px;border-radius:50%;flex:none;display:grid;place-items:center;position:relative;}
+  .donut::after{content:"";position:absolute;inset:22px;background:#fff;border-radius:50%;}
+  .donut .ct{position:relative;z-index:2;text-align:center;}
+  .donut .ct b{font-size:22px;display:block;}
+  .donut .ct span{font-size:11px;color:var(--muted);}
+  .legend{display:flex;flex-direction:column;gap:8px;flex:1;min-width:150px;}
+  .legend .lg{display:flex;align-items:center;gap:8px;font-size:13px;}
+  .legend .sw{width:12px;height:12px;border-radius:4px;flex:none;}
+  .legend .pc{margin-left:auto;font-weight:700;}
+
+  /* news */
+  .news{background:#fff;border-radius:14px;padding:15px;margin-bottom:12px;box-shadow:var(--shadow);border-left:4px solid var(--amber);}
+  .news .cat{font-size:11px;font-weight:700;color:var(--amber);text-transform:uppercase;letter-spacing:.4px;}
+  .news .nt{font-weight:700;font-size:15px;margin:3px 0;}
+  .news .nb{font-size:13px;color:var(--muted);}
+  .news .nd{font-size:11.5px;color:#9aa8a0;margin-top:7px;}
+
+  /* toast */
+  .toast{position:fixed;left:50%;bottom:26px;transform:translateX(-50%) translateY(40px);background:var(--green-dark);color:#fff;padding:13px 20px;border-radius:12px;font-size:14px;font-weight:600;box-shadow:var(--shadow-lg);z-index:100;opacity:0;transition:.3s;max-width:90%;text-align:center;}
+  .toast.show{opacity:1;transform:translateX(-50%) translateY(0);}
+
+  /* modal success */
+  .modal{position:fixed;inset:0;background:rgba(10,20,15,.55);display:none;align-items:center;justify-content:center;z-index:90;padding:20px;}
+  .modal.show{display:flex;}
+  .modal .box{background:#fff;border-radius:20px;padding:28px 24px;text-align:center;max-width:340px;width:100%;animation:pop .3s ease;}
+  @keyframes pop{from{transform:scale(.85);opacity:0;}to{transform:scale(1);opacity:1;}}
+  .modal .ok{width:64px;height:64px;border-radius:50%;background:var(--green-light);display:grid;place-items:center;font-size:32px;margin:0 auto 14px;}
+  .modal h3{font-size:19px;font-weight:700;}
+  .modal p{color:var(--muted);font-size:13.5px;margin:8px 0 4px;}
+  .modal .tno-big{font-size:22px;font-weight:800;color:var(--green-dark);margin:10px 0 18px;letter-spacing:1px;}
+
+  .seg{display:flex;gap:6px;margin-bottom:12px;overflow-x:auto;}
+  .seg button{white-space:nowrap;border:1.5px solid #dde8e1;background:#fff;color:var(--muted);padding:7px 13px;border-radius:999px;font-size:12.5px;font-weight:600;cursor:pointer;}
+  .seg button.on{background:var(--ink);color:#fff;border-color:var(--ink);}
+  .backlink{display:inline-flex;align-items:center;gap:6px;color:#fff;text-decoration:none;font-size:12px;opacity:.9;}
+  .staff-actions{display:flex;gap:8px;margin-top:12px;border-top:1px dashed #e4efe8;padding-top:12px;flex-wrap:wrap;align-items:center;}
+  .staff-actions select{width:auto;flex:1;min-width:130px;padding:9px 11px;}
+  .mini{font-size:11px;color:var(--muted);}
+</style>
+</head>
+<body>
+<div class="app">
+  <div class="topbar">
+    <div class="seal">🏛️</div>
+    <div class="ttl">ระบบบริการประชาชน <small>อบต.บึงคำพร้อย · Demo</small></div>
+    <button class="reset" id="resetBtn">↺ รีเซ็ต</button>
+  </div>
+
+  <div class="roles" id="roles"></div>
+  <div class="subtabs" id="subtabs"></div>
+
+  <main id="main"></main>
+</div>
+
+<div class="toast" id="toast"></div>
+<div class="modal" id="modal">
+  <div class="box">
+    <div class="ok">✅</div>
+    <h3>ส่งคำร้องสำเร็จ</h3>
+    <p>เจ้าหน้าที่ได้รับเรื่องของท่านแล้ว<br/>ติดตามสถานะได้ที่เมนู "เรื่องของฉัน"</p>
+    <div class="tno-big" id="modalTno">SM-0000</div>
+    <button class="btn btn-primary" id="modalClose">ดูสถานะคำร้อง</button>
+  </div>
+</div>
+
+<script>
+/* ============ DATA LAYER ============ */
+const KEY='sm_demo_v1';
+const TYPES=[
+  {id:'road',label:'ถนนชำรุด',icon:'🛣️',color:'#ef4444'},
+  {id:'light',label:'ไฟฟ้าสาธารณะ',icon:'💡',color:'#f59e0b'},
+  {id:'flood',label:'น้ำท่วม/ระบายน้ำ',icon:'🌊',color:'#2563eb'},
+  {id:'waste',label:'ขยะตกค้าง',icon:'🗑️',color:'#1f9d55'},
+  {id:'other',label:'อื่น ๆ',icon:'📌',color:'#8b5cf6'},
+];
+const AREAS=['หมู่ 1','หมู่ 2','หมู่ 3','หมู่ 4','หมู่ 5','หมู่ 6','หมู่ 7','หมู่ 8'];
+const STAFF=['ยังไม่มอบหมาย','กองช่าง','กองสาธารณสุข','กองสวัสดิการ','งานป้องกันฯ'];
+const STATUS={received:{label:'รับเรื่องแล้ว',color:'#f59e0b',cls:'b-received'},in_progress:{label:'กำลังดำเนินการ',color:'#2563eb',cls:'b-in_progress'},done:{label:'ดำเนินการเสร็จสิ้น',color:'#1f9d55',cls:'b-done'}};
+
+function typeOf(id){return TYPES.find(t=>t.id===id)||TYPES[4];}
+function now(){return Date.now();}
+function fmt(ts){const d=new Date(ts);return d.toLocaleDateString('th-TH',{day:'numeric',month:'short'})+' '+d.toLocaleTimeString('th-TH',{hour:'2-digit',minute:'2-digit'});}
+
+function seed(){
+  const t=now(), H=3600000, D=86400000;
+  const mk=(n,type,title,detail,area,status,assignee,ageH,updates)=>({
+    id:'r'+n, ticket:'SM-'+String(1000+n), type, title, detail, area, lat:13.96+Math.random()*.04, lng:100.7+Math.random()*.05,
+    photo:null, status, assignee, by:'ประชาชน', createdAt:t-ageH*H, updates
+  });
+  return {
+    requests:[
+      mk(1,'road','ถนนลูกรังเป็นหลุมบ่อ','หลังฝนตกมีน้ำขังเป็นหลุมลึก รถผ่านลำบาก','หมู่ 5','in_progress','กองช่าง',30,
+        [{status:'received',note:'รับเรื่องเข้าระบบ',at:t-30*H,by:'ระบบ'},{status:'in_progress',note:'มอบหมายกองช่างลงพื้นที่สำรวจ',at:t-20*H,by:'เจ้าหน้าที่'}]),
+      mk(2,'light','ไฟส่องสว่างดับ 3 ต้น','ปากซอยมืดมาก เสี่ยงอุบัติเหตุตอนกลางคืน','หมู่ 3','done','กองช่าง',52,
+        [{status:'received',note:'รับเรื่องเข้าระบบ',at:t-52*H,by:'ระบบ'},{status:'in_progress',note:'ประสานการไฟฟ้าเข้าซ่อม',at:t-40*H,by:'เจ้าหน้าที่'},{status:'done',note:'เปลี่ยนหลอดไฟเรียบร้อย ใช้งานได้ปกติ',at:t-12*H,by:'กองช่าง'}]),
+      mk(3,'waste','ขยะตกค้างริมคลอง','ไม่ได้เก็บมา 4 วัน เริ่มมีกลิ่นเหม็น','หมู่ 5','received','ยังไม่มอบหมาย',6,
+        [{status:'received',note:'รับเรื่องเข้าระบบ',at:t-6*H,by:'ระบบ'}]),
+      mk(4,'flood','น้ำท่วมขังหน้าตลาด','ท่อระบายน้ำอุดตัน น้ำขังสูง','หมู่ 1','in_progress','กองช่าง',18,
+        [{status:'received',note:'รับเรื่องเข้าระบบ',at:t-18*H,by:'ระบบ'},{status:'in_progress',note:'ส่งทีมลอกท่อระบายน้ำ',at:t-10*H,by:'เจ้าหน้าที่'}]),
+      mk(5,'waste','ถังขยะชำรุด','ถังขยะแตก ฝาหาย สุนัขคุ้ยกระจาย','หมู่ 8','done','กองสาธารณสุข',70,
+        [{status:'received',note:'รับเรื่องเข้าระบบ',at:t-70*H,by:'ระบบ'},{status:'in_progress',note:'จัดหาถังใหม่',at:t-50*H,by:'เจ้าหน้าที่'},{status:'done',note:'ติดตั้งถังขยะใหม่แล้ว',at:t-24*H,by:'กองสาธารณสุข'}]),
+      mk(6,'road','ฝาท่อระบายน้ำหาย','อันตรายมาก เด็กเดินผ่านไปโรงเรียน','หมู่ 5','received','ยังไม่มอบหมาย',2,
+        [{status:'received',note:'รับเรื่องเข้าระบบ',at:t-2*H,by:'ระบบ'}]),
+      mk(7,'light','ไฟกระพริบตลอดเวลา','เสาไฟหน้าวัด กระพริบ น่าจะสายชำรุด','หมู่ 3','received','ยังไม่มอบหมาย',26,
+        [{status:'received',note:'รับเรื่องเข้าระบบ',at:t-26*H,by:'ระบบ'}]),
+    ],
+    news:[
+      {id:'n1',cat:'ประกาศด่วน',title:'แจ้งหยุดจ่ายน้ำประปาชั่วคราว',body:'วันที่ 22 มิ.ย. เวลา 09.00–15.00 น. หมู่ 3 และ หมู่ 5 เพื่อซ่อมท่อเมน',at:t-4*H},
+      {id:'n2',cat:'กิจกรรมชุมชน',title:'โครงการ Big Cleaning Day',body:'ขอเชิญร่วมพัฒนาความสะอาดในชุมชน วันเสาร์ที่ 28 มิ.ย. ณ ศาลาประชาคม',at:t-1*D},
+      {id:'n3',cat:'แจ้งเตือนภัย',title:'เฝ้าระวังฝนตกหนัก',body:'กรมอุตุฯ เตือนพายุฝนช่วงวันที่ 20–23 มิ.ย. พื้นที่ลุ่มต่ำเตรียมรับมือน้ำท่วมขัง',at:t-2*D},
+    ],
+    seq:8
+  };
+}
+function load(){try{const d=JSON.parse(localStorage.getItem(KEY));if(d&&d.requests)return d;}catch(e){}const s=seed();save(s);return s;}
+function save(d){localStorage.setItem(KEY,JSON.stringify(d));}
+let DB=load();
+
+/* ============ UI STATE ============ */
+const ROLES=[
+  {id:'citizen',label:'ประชาชน',em:'👨‍👩‍👧‍👦',tabs:[['report','แจ้งปัญหา'],['mine','เรื่องของฉัน'],['news','ข่าวสาร'],['service','ขอบริการ']]},
+  {id:'staff',label:'เจ้าหน้าที่',em:'👨‍💼',tabs:[['queue','คิวคำร้อง'],['bot','AI Chatbot']]},
+  {id:'exec',label:'ผู้บริหาร',em:'👨‍💻',tabs:[['dash','Dashboard']]},
+];
+let state={role:'citizen',tab:'report'};
+let form={type:null,photo:null,lat:null,lng:null};
+
+/* ============ HELPERS ============ */
+const $=s=>document.querySelector(s);
+function toast(msg){const t=$('#toast');t.textContent=msg;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),2200);}
+function esc(s){return (s||'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));}
+
+/* image downscale to keep localStorage small */
+function readImage(file){return new Promise(res=>{
+  const r=new FileReader();r.onload=()=>{const img=new Image();img.onload=()=>{
+    const max=820,sc=Math.min(1,max/Math.max(img.width,img.height));
+    const c=document.createElement('canvas');c.width=img.width*sc;c.height=img.height*sc;
+    c.getContext('2d').drawImage(img,0,0,c.width,c.height);res(c.toDataURL('image/jpeg',.72));
+  };img.src=r.result;};r.readAsDataURL(file);
+});}
+
+/* ============ RENDER ============ */
+function renderChrome(){
+  $('#roles').innerHTML=ROLES.map(r=>`<button class="role-btn ${r.id===state.role?'active':''}" data-role="${r.id}"><span class="em">${r.em}</span>${r.label}</button>`).join('');
+  const role=ROLES.find(r=>r.id===state.role);
+  $('#subtabs').innerHTML=role.tabs.map(([id,lb])=>`<button class="subtab ${id===state.tab?'active':''}" data-tab="${id}">${lb}</button>`).join('');
+}
+function render(){
+  renderChrome();
+  const v={report:vReport,mine:vMine,news:vNews,service:vService,queue:vQueue,bot:vBot,dash:vDash}[state.tab];
+  $('#main').innerHTML=`<div class="view">${v?v():''}</div>`;
+  if(state.tab==='report')bindReport();
+  if(state.tab==='queue')bindQueue();
+}
+
+/* ---- CITIZEN: report ---- */
+function vReport(){
+  return `<div class="card">
+    <h3>🚨 แจ้งปัญหาในพื้นที่</h3>
+    <div class="hint">เลือกประเภท แนบรูป และปักพิกัด GPS ส่งถึงเจ้าหน้าที่ทันที</div>
+    <label class="fl">ประเภทปัญหา</label>
+    <div class="chips" id="typeChips">${TYPES.map(t=>`<div class="chip ${form.type===t.id?'sel':''}" data-type="${t.id}">${t.icon} ${t.label}</div>`).join('')}</div>
+    <label class="fl">หัวข้อเรื่อง</label>
+    <input type="text" id="fTitle" placeholder="เช่น ถนนเป็นหลุมหน้าปากซอย 5" />
+    <label class="fl">รายละเอียด</label>
+    <textarea id="fDetail" placeholder="อธิบายปัญหาที่พบ..."></textarea>
+    <label class="fl">พื้นที่ (หมู่)</label>
+    <select id="fArea">${AREAS.map(a=>`<option>${a}</option>`).join('')}</select>
+    <label class="fl">แนบรูปภาพ</label>
+    <div class="photo-pick" id="photoPick">📷 แตะเพื่อถ่ายภาพ / เลือกรูป</div>
+    <input type="file" id="fPhoto" accept="image/*" capture="environment" hidden />
+    <label class="fl">พิกัด GPS</label>
+    <div class="gps-box"><button class="btn btn-ghost" id="gpsBtn" style="flex:1">📍 ปักพิกัดปัจจุบัน</button></div>
+    <div class="gps-status" id="gpsStatus">ยังไม่ได้ระบุพิกัด (ไม่บังคับ)</div>
+    <div style="height:18px"></div>
+    <button class="btn btn-primary" id="submitBtn">📨 ส่งคำร้อง</button>
+  </div>`;
+}
+function bindReport(){
+  $('#typeChips').onclick=e=>{const c=e.target.closest('[data-type]');if(!c)return;form.type=c.dataset.type;
+    document.querySelectorAll('#typeChips .chip').forEach(x=>x.classList.toggle('sel',x.dataset.type===form.type));};
+  const pick=$('#photoPick'),inp=$('#fPhoto');
+  pick.onclick=()=>inp.click();
+  inp.onchange=async()=>{if(!inp.files[0])return;pick.classList.add('has');pick.innerHTML='⏳ กำลังประมวลผลรูป...';
+    form.photo=await readImage(inp.files[0]);pick.innerHTML=`<img src="${form.photo}" alt="">`;};
+  $('#gpsBtn').onclick=()=>{const s=$('#gpsStatus');
+    if(!navigator.geolocation){s.textContent='อุปกรณ์ไม่รองรับ GPS';return;}
+    s.textContent='กำลังระบุตำแหน่ง...';
+    navigator.geolocation.getCurrentPosition(p=>{form.lat=p.coords.latitude;form.lng=p.coords.longitude;
+      s.className='gps-status ok';s.textContent=`✅ ปักพิกัดแล้ว: ${form.lat.toFixed(5)}, ${form.lng.toFixed(5)}`;},
+      ()=>{form.lat=13.9742;form.lng=100.7184;s.className='gps-status ok';s.textContent='✅ ปักพิกัดโดยประมาณ (จำลอง): 13.97420, 100.71840';},{timeout:6000});};
+  $('#submitBtn').onclick=submitReport;
+}
+function submitReport(){
+  const title=$('#fTitle').value.trim(),detail=$('#fDetail').value.trim(),area=$('#fArea').value;
+  if(!form.type){toast('กรุณาเลือกประเภทปัญหา');return;}
+  if(!title){toast('กรุณากรอกหัวข้อเรื่อง');return;}
+  const n=DB.seq++;const t=now();
+  const req={id:'r'+n,ticket:'SM-'+String(1000+n),type:form.type,title,detail,area,
+    lat:form.lat,lng:form.lng,photo:form.photo,status:'received',assignee:'ยังไม่มอบหมาย',by:'ประชาชน',createdAt:t,
+    updates:[{status:'received',note:'รับเรื่องเข้าระบบ รอเจ้าหน้าที่ตรวจสอบ',at:t,by:'ระบบ'}]};
+  DB.requests.unshift(req);save(DB);
+  $('#modalTno').textContent=req.ticket;$('#modal').classList.add('show');
+  form={type:null,photo:null,lat:null,lng:null};
+}
+
+/* ---- CITIZEN: mine / track ---- */
+let mineFilter='all';
+function vMine(){
+  const list=DB.requests.filter(r=>r.by==='ประชาชน');
+  const f=mineFilter==='all'?list:list.filter(r=>r.status===mineFilter);
+  const seg=`<div class="seg">
+    <button class="${mineFilter==='all'?'on':''}" data-f="all">ทั้งหมด (${list.length})</button>
+    <button class="${mineFilter==='received'?'on':''}" data-f="received">🟡 รับเรื่อง</button>
+    <button class="${mineFilter==='in_progress'?'on':''}" data-f="in_progress">🔵 ดำเนินการ</button>
+    <button class="${mineFilter==='done'?'on':''}" data-f="done">🟢 เสร็จสิ้น</button>
+  </div>`;
+  const body=f.length?f.map(reqCard).join(''):`<div class="empty"><div class="em">📭</div>ยังไม่มีคำร้องในหมวดนี้<br/><span class="mini">ลองแจ้งปัญหาที่เมนู "แจ้งปัญหา"</span></div>`;
+  setTimeout(()=>{const s=document.querySelector('.seg');if(s)s.onclick=e=>{const b=e.target.closest('[data-f]');if(b){mineFilter=b.dataset.f;render();}};},0);
+  return seg+body;
+}
+function reqCard(r){
+  const st=STATUS[r.status],ty=typeOf(r.type);
+  const map=r.lat?`<a href="https://www.google.com/maps?q=${r.lat},${r.lng}" target="_blank">📍 ดูแผนที่</a>`:'';
+  return `<div class="req">
+    <div class="top">
+      <div><div class="tno">${r.ticket} · ${ty.icon} ${ty.label}</div><div class="ttl">${esc(r.title)}</div></div>
+      <span class="badge ${st.cls}"><span class="dot" style="background:${st.color}"></span>${st.label}</span>
+    </div>
+    ${r.detail?`<div class="mini" style="margin-top:4px">${esc(r.detail)}</div>`:''}
+    <div class="meta"><span>📌 ${r.area}</span><span>🕒 ${fmt(r.createdAt)}</span>${map}<span>👷 ${esc(r.assignee)}</span></div>
+    ${r.photo?`<img class="ph" src="${r.photo}">`:''}
+    <div class="timeline">${r.updates.map(u=>`<div class="tl"><span class="tdot" style="background:${STATUS[u.status].color}"></span><div class="tw"><div class="tt">${STATUS[u.status].label}</div><div class="tm">${esc(u.note)} · ${fmt(u.at)} · โดย ${esc(u.by)}</div></div></div>`).join('')}</div>
+  </div>`;
+}
+
+/* ---- CITIZEN: news ---- */
+function vNews(){
+  return DB.news.map(n=>`<div class="news"><div class="cat">📢 ${esc(n.cat)}</div><div class="nt">${esc(n.title)}</div><div class="nb">${esc(n.body)}</div><div class="nd">🕒 ${fmt(n.at)}</div></div>`).join('');
+}
+/* ---- CITIZEN: service ---- */
+function vService(){
+  const items=[['📄','ขอเอกสารราชการ','สำเนาทะเบียนบ้าน, หนังสือรับรอง'],['📅','จองคิวบริการ','เลือกวัน–เวลาเข้ารับบริการล่วงหน้า'],['💧','ชำระค่าน้ำประปา','ตรวจสอบยอด/แจ้งชำระออนไลน์'],['📋','ยื่นคำร้องทั่วไป','ขออนุญาตก่อสร้าง, ขึ้นทะเบียนต่าง ๆ'],['📞','ติดต่อเจ้าหน้าที่','สอบถามข้อมูลกับแต่ละกอง'],['♻️','แจ้งนัดเก็บขยะ','ขยะชิ้นใหญ่/ขยะอันตราย']];
+  return `<div class="card"><h3>📄 ขอรับบริการออนไลน์</h3><div class="hint">เลือกบริการที่ต้องการ (ตัวอย่างหน้าจอ)</div>
+    <div class="chips" style="flex-direction:column;align-items:stretch">${items.map(i=>`<div class="chip" style="justify-content:flex-start" onclick="window.__t('เปิดบริการ: ${i[1]} (เดโม)')"><span style="font-size:20px">${i[0]}</span><div style="text-align:left"><div style="font-weight:600">${i[1]}</div><div class="mini">${i[2]}</div></div></div>`).join('')}</div></div>`;
+}
+window.__t=toast;
+
+/* ---- STAFF: queue ---- */
+let qFilter={status:'all',type:'all',q:''};
+function vQueue(){
+  const total=DB.requests.length,pend=DB.requests.filter(r=>r.status!=='done').length,done=DB.requests.filter(r=>r.status==='done').length;
+  let list=DB.requests.slice();
+  if(qFilter.status!=='all')list=list.filter(r=>r.status===qFilter.status);
+  if(qFilter.type!=='all')list=list.filter(r=>r.type===qFilter.type);
+  if(qFilter.q)list=list.filter(r=>(r.title+r.detail+r.area+r.ticket).toLowerCase().includes(qFilter.q.toLowerCase()));
+  const head=`<div class="card"><h3>📋 ระบบจัดการคำร้อง</h3>
+    <div class="kpis"><div class="kpi t"><div class="n">${total}</div><div class="l">ทั้งหมด</div></div><div class="kpi p"><div class="n">${pend}</div><div class="l">ค้างดำเนินการ</div></div><div class="kpi d"><div class="n">${done}</div><div class="l">เสร็จสิ้น</div></div></div>
+    <input type="text" id="qSearch" placeholder="🔍 ค้นหา เลขที่/หัวข้อ/พื้นที่" value="${esc(qFilter.q)}" />
+    <div class="seg" style="margin-top:10px" id="qStatus">
+      <button class="${qFilter.status==='all'?'on':''}" data-s="all">ทุกสถานะ</button>
+      <button class="${qFilter.status==='received'?'on':''}" data-s="received">🟡 ใหม่</button>
+      <button class="${qFilter.status==='in_progress'?'on':''}" data-s="in_progress">🔵 ดำเนินการ</button>
+      <button class="${qFilter.status==='done'?'on':''}" data-s="done">🟢 เสร็จ</button>
+    </div>
+    <div class="seg" id="qType"><button class="${qFilter.type==='all'?'on':''}" data-t="all">ทุกประเภท</button>${TYPES.map(t=>`<button class="${qFilter.type===t.id?'on':''}" data-t="${t.id}">${t.icon} ${t.label}</button>`).join('')}</div>
+  </div>`;
+  const body=list.length?list.map(staffCard).join(''):`<div class="empty"><div class="em">✅</div>ไม่มีคำร้องตรงเงื่อนไข</div>`;
+  return head+body;
+}
+function staffCard(r){
+  const st=STATUS[r.status],ty=typeOf(r.type);
+  const map=r.lat?`<a href="https://www.google.com/maps?q=${r.lat},${r.lng}" target="_blank">📍 แผนที่</a>`:'';
+  return `<div class="req" data-id="${r.id}">
+    <div class="top"><div><div class="tno">${r.ticket} · ${ty.icon} ${ty.label}</div><div class="ttl">${esc(r.title)}</div></div>
+      <span class="badge ${st.cls}"><span class="dot" style="background:${st.color}"></span>${st.label}</span></div>
+    ${r.detail?`<div class="mini" style="margin-top:4px">${esc(r.detail)}</div>`:''}
+    <div class="meta"><span>📌 ${r.area}</span><span>🕒 ${fmt(r.createdAt)}</span>${map}</div>
+    ${r.photo?`<img class="ph" src="${r.photo}">`:''}
+    <div class="staff-actions">
+      <select class="aSel" data-id="${r.id}">${STAFF.map(s=>`<option ${s===r.assignee?'selected':''}>${s}</option>`).join('')}</select>
+      <select class="sSel" data-id="${r.id}">${Object.keys(STATUS).map(k=>`<option value="${k}" ${k===r.status?'selected':''}>${STATUS[k].label}</option>`).join('')}</select>
+      <button class="btn btn-primary btn-sm uBtn" data-id="${r.id}" style="width:auto">บันทึก</button>
+    </div>
+  </div>`;
+}
+function bindQueue(){
+  const s=$('#qSearch');if(s)s.oninput=()=>{qFilter.q=s.value;const f=document.activeElement===s;render();if(f){const n=$('#qSearch');n.focus();n.setSelectionRange(n.value.length,n.value.length);}};
+  $('#qStatus').onclick=e=>{const b=e.target.closest('[data-s]');if(b){qFilter.status=b.dataset.s;render();}};
+  $('#qType').onclick=e=>{const b=e.target.closest('[data-t]');if(b){qFilter.type=b.dataset.t;render();}};
+  document.querySelectorAll('.uBtn').forEach(btn=>btn.onclick=()=>{
+    const id=btn.dataset.id,r=DB.requests.find(x=>x.id===id);
+    const a=document.querySelector(`.aSel[data-id="${id}"]`).value;
+    const ns=document.querySelector(`.sSel[data-id="${id}"]`).value;
+    const changed=(ns!==r.status)||(a!==r.assignee);
+    if(!changed){toast('ไม่มีการเปลี่ยนแปลง');return;}
+    r.assignee=a;
+    if(ns!==r.status){r.status=ns;r.updates.push({status:ns,note:`อัปเดตสถานะ — ผู้รับผิดชอบ: ${a}`,at:now(),by:'เจ้าหน้าที่'});}
+    save(DB);toast('✅ อัปเดตคำร้องแล้ว');render();
+  });
+}
+
+/* ---- STAFF: AI bot (mock) ---- */
+function vBot(){
+  const qa=[['เวลาทำการ','เปิดให้บริการ จันทร์–ศุกร์ 08.30–16.30 น. (พักเที่ยง 12.00–13.00 น.) หยุดวันหยุดราชการ'],
+    ['ขอสำเนาทะเบียนบ้านใช้เอกสารอะไร','ใช้บัตรประชาชนเจ้าบ้าน + ทะเบียนบ้านฉบับจริง หากมอบอำนาจต้องมีหนังสือมอบอำนาจ'],
+    ['แจ้งไฟดับติดต่อใคร','แจ้งผ่าน LINE OA เมนู "แจ้งปัญหา" หรือกองช่าง โทร 0-2xxx-xxxx ต่อ 13'],
+    ['เก็บขยะวันไหน','เขต หมู่ 1–4 เก็บ จ/พ/ศ, หมู่ 5–8 เก็บ อ/พฤ/ส เริ่ม 06.00 น.']];
+  return `<div class="card"><h3>🤖 AI Chatbot</h3><div class="hint">ตัวอย่างคำถามที่บอทตอบอัตโนมัติ 24 ชม. (แตะเพื่อดูคำตอบ)</div>
+    <div id="botBox" style="display:flex;flex-direction:column;gap:10px">
+      ${qa.map((x,i)=>`<div class="chip" style="justify-content:flex-start" data-i="${i}">❓ ${x[0]}</div>`).join('')}
+    </div>
+    <div id="botAns" style="margin-top:12px"></div></div>`;
+}
+setTimeout(()=>{},0);
+
+/* ---- EXEC: dashboard ---- */
+function vDash(){
+  const R=DB.requests,total=R.length;
+  const done=R.filter(r=>r.status==='done').length;
+  const pend=R.filter(r=>r.status!=='done').length;
+  // by type
+  const byType=TYPES.map(t=>({t,c:R.filter(r=>r.type===t.id).length})).filter(x=>x.c>0);
+  const tmax=Math.max(1,...byType.map(x=>x.c));
+  // donut conic
+  let acc=0;const segs=byType.map(x=>{const from=acc/total*100;acc+=x.c;const to=acc/total*100;return `${x.t.color} ${from}% ${to}%`;});
+  const donutBg=total?`conic-gradient(${segs.join(',')})`:'#eef4f0';
+  // by area
+  const byArea=AREAS.map(a=>({a,c:R.filter(r=>r.area===a).length})).filter(x=>x.c>0).sort((p,q)=>q.c-p.c).slice(0,6);
+  const amax=Math.max(1,...byArea.map(x=>x.c));
+  // status breakdown
+  const recv=R.filter(r=>r.status==='received').length,inp=R.filter(r=>r.status==='in_progress').length;
+  const rate=total?Math.round(done/total*100):0;
+  return `<div class="card"><h3>📊 Dashboard ผู้บริหาร <span class="mini" style="font-weight:400">· อัปเดตสด</span></h3>
+    <div class="kpis"><div class="kpi t"><div class="n">${total}</div><div class="l">คำร้องทั้งหมด</div></div><div class="kpi d"><div class="n">${done}</div><div class="l">เสร็จสิ้น</div></div><div class="kpi p"><div class="n">${pend}</div><div class="l">ค้างดำเนินการ</div></div></div>
+    <div class="bar-row"><span class="nm">อัตราแล้วเสร็จ</span><div class="bar-tk"><div class="bar-fl" style="width:${rate}%"></div></div><span class="vl">${rate}%</span></div>
+    <div class="row" style="gap:8px;margin-top:6px">
+      <span class="badge b-received"><span class="dot" style="background:#f59e0b"></span>ใหม่ ${recv}</span>
+      <span class="badge b-in_progress"><span class="dot" style="background:#2563eb"></span>ดำเนินการ ${inp}</span>
+      <span class="badge b-done"><span class="dot" style="background:#1f9d55"></span>เสร็จ ${done}</span>
+    </div>
+  </div>
+  <div class="card"><h3>🗂️ สัดส่วนตามประเภทปัญหา</h3>
+    <div class="donut-wrap"><div class="donut" style="background:${donutBg}"><div class="ct"><b>${total}</b><span>คำร้อง</span></div></div>
+      <div class="legend">${byType.map(x=>`<div class="lg"><span class="sw" style="background:${x.t.color}"></span>${x.t.label}<span class="pc">${Math.round(x.c/total*100)}%</span></div>`).join('')}</div></div></div>
+  <div class="card"><h3>📍 พื้นที่ที่มีการแจ้งเหตุสูง</h3>
+    ${byArea.map(x=>`<div class="bar-row"><span class="nm">${x.a}</span><div class="bar-tk"><div class="bar-fl" style="width:${x.c/amax*100}%"></div></div><span class="vl">${x.c}</span></div>`).join('')}</div>`;
+}
+
+/* ============ EVENTS ============ */
+$('#roles').onclick=e=>{const b=e.target.closest('[data-role]');if(!b)return;state.role=b.dataset.role;state.tab=ROLES.find(r=>r.id===state.role).tabs[0][0];render();};
+$('#subtabs').onclick=e=>{const b=e.target.closest('[data-tab]');if(!b)return;state.tab=b.dataset.tab;render();};
+document.body.addEventListener('click',e=>{
+  const bi=e.target.closest('#botBox [data-i]');
+  if(bi){const qa=[['เวลาทำการ','เปิดให้บริการ จันทร์–ศุกร์ 08.30–16.30 น. (พักเที่ยง 12.00–13.00 น.) หยุดวันหยุดราชการ'],['ขอสำเนาทะเบียนบ้านใช้เอกสารอะไร','ใช้บัตรประชาชนเจ้าบ้าน + ทะเบียนบ้านฉบับจริง หากมอบอำนาจต้องมีหนังสือมอบอำนาจ'],['แจ้งไฟดับติดต่อใคร','แจ้งผ่าน LINE OA เมนู "แจ้งปัญหา" หรือกองช่าง โทร 0-2xxx-xxxx ต่อ 13'],['เก็บขยะวันไหน','เขต หมู่ 1–4 เก็บ จ/พ/ศ, หมู่ 5–8 เก็บ อ/พฤ/ส เริ่ม 06.00 น.']];
+    $('#botAns').innerHTML=`<div class="news" style="border-color:var(--line);border-left-color:var(--line)"><div class="cat" style="color:var(--green-dark)">🤖 บอทตอบ</div><div class="nb" style="color:var(--ink);margin-top:4px">${qa[bi.dataset.i][1]}</div></div>`;}
+});
+$('#modalClose').onclick=()=>{$('#modal').classList.remove('show');state.tab='mine';mineFilter='all';render();};
+$('#resetBtn').onclick=()=>{if(confirm('รีเซ็ตข้อมูลตัวอย่างทั้งหมดกลับเป็นค่าเริ่มต้น?')){localStorage.removeItem(KEY);DB=load();toast('♻️ รีเซ็ตข้อมูลแล้ว');render();}};
+
+render();
+</script>
+</body>
+</html>
