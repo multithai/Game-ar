@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0" />
+<title>ศูนย์บริการดิจิทัล อบต.บึงคำพร้อย — Demo Hub</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
+<style>
+  :root{
+    --line:#06c755;--green:#1f9d55;--green-dark:#15803d;--ink:#13261b;--muted:#5c6b62;
+    --bg:#eef3ef;--card:#fff;--shadow:0 8px 24px rgba(18,52,33,.08);--shadow-lg:0 18px 44px rgba(18,52,33,.14);
+  }
+  *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;}
+  body{font-family:'Prompt',system-ui,sans-serif;background:var(--bg);color:var(--ink);line-height:1.5;}
+  a{text-decoration:none;color:inherit;}
+  .app{max-width:920px;margin:0 auto;min-height:100vh;}
+
+  .hero{background:
+      radial-gradient(700px 300px at 90% -20%,rgba(255,255,255,.25),transparent 60%),
+      linear-gradient(135deg,var(--green-dark),var(--line));
+    color:#fff;padding:20px 18px 26px;border-radius:0 0 26px 26px;position:relative;}
+  .hero .bar{display:flex;align-items:center;gap:12px;}
+  .hero .seal{width:46px;height:46px;border-radius:13px;background:rgba(255,255,255,.2);display:grid;place-items:center;font-size:24px;flex:none;}
+  .hero .org{font-weight:700;font-size:16px;line-height:1.2;}
+  .hero .org small{display:block;font-weight:400;font-size:11.5px;opacity:.9;}
+  .hero .greet{margin-top:18px;font-size:20px;font-weight:700;}
+  .hero .sub{font-size:13px;opacity:.92;margin-top:2px;}
+  .hero .pres{position:absolute;top:18px;right:16px;background:rgba(255,255,255,.18);padding:7px 12px;border-radius:999px;font-size:12px;font-weight:600;}
+
+  .stats{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin:-18px 14px 0;position:relative;z-index:2;}
+  .stat{background:#fff;border-radius:14px;padding:12px 8px;text-align:center;box-shadow:var(--shadow);border:1px solid #eef4f0;}
+  .stat .n{font-size:21px;font-weight:800;line-height:1;}
+  .stat .l{font-size:10px;color:var(--muted);margin-top:4px;line-height:1.25;}
+  .stat.s1 .n{color:#1f9d55;}.stat.s2 .n{color:#0891b2;}.stat.s3 .n{color:#6366f1;}.stat.s4 .n{color:#7c3aed;}
+
+  .sec{padding:20px 16px 8px;}
+  .sec h2{font-size:15px;font-weight:700;display:flex;align-items:center;gap:8px;}
+  .grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;padding:6px 16px;}
+  .tile{background:#fff;border-radius:18px;padding:16px;box-shadow:var(--shadow);border:1px solid #eef4f0;transition:.18s;display:flex;flex-direction:column;gap:8px;min-height:128px;position:relative;overflow:hidden;}
+  .tile:active{transform:scale(.97);}
+  .tile .ic{width:46px;height:46px;border-radius:13px;display:grid;place-items:center;font-size:24px;color:#fff;}
+  .tile .tt{font-weight:700;font-size:15px;}
+  .tile .td{font-size:11.5px;color:var(--muted);flex:1;}
+  .tile .badge{align-self:flex-start;font-size:10.5px;font-weight:700;padding:3px 9px;border-radius:999px;}
+  .tile .arrow{position:absolute;right:14px;top:16px;color:#cbd5cf;font-size:16px;}
+
+  .news{padding:6px 16px 0;}
+  .newsitem{background:#fff;border-radius:13px;padding:13px 15px;box-shadow:var(--shadow);border-left:4px solid #f59e0b;margin-bottom:10px;}
+  .newsitem .cat{font-size:10.5px;font-weight:700;color:#f59e0b;}
+  .newsitem .nt{font-weight:600;font-size:14px;margin:2px 0;}
+  .newsitem .nb{font-size:12px;color:var(--muted);}
+
+  .help{margin:14px 16px 0;background:linear-gradient(135deg,#0e7490,#0891b2);color:#fff;border-radius:16px;padding:16px;display:flex;align-items:center;gap:14px;}
+  .help .hic{font-size:30px;}
+  .help .ht{font-weight:700;font-size:15px;}
+  .help .hd{font-size:12px;opacity:.9;}
+
+  footer{text-align:center;color:var(--muted);font-size:11.5px;padding:24px 16px 36px;}
+  .toast{position:fixed;left:50%;bottom:26px;transform:translateX(-50%) translateY(40px);background:var(--green-dark);color:#fff;padding:13px 20px;border-radius:12px;font-size:14px;font-weight:600;box-shadow:var(--shadow-lg);z-index:100;opacity:0;transition:.3s;max-width:90%;text-align:center;}
+  .toast.show{opacity:1;transform:translateX(-50%) translateY(0);}
+</style>
+</head>
+<body>
+<div class="app">
+  <div class="hero">
+    <a href="../../" class="pres">📊 หน้านำเสนอ</a>
+    <div class="bar"><div class="seal">🏛️</div><div class="org">อบต.บึงคำพร้อย<small>ศูนย์บริการประชาชนดิจิทัล 24 ชม.</small></div></div>
+    <div class="greet" id="greet">สวัสดีครับ 👋</div>
+    <div class="sub">เลือกบริการที่ต้องการได้เลย — ทุกบริการอยู่ในที่เดียว</div>
+  </div>
+
+  <div class="stats" id="stats"></div>
+
+  <div class="sec"><h2>⚙️ บริการทั้งหมด</h2></div>
+  <div class="grid" id="grid"></div>
+
+  <div class="sec"><h2>📢 ข่าวสาร & ประกาศ</h2></div>
+  <div class="news" id="news"></div>
+
+  <a class="help" href="../#bot" id="helpCard">
+    <div class="hic">🤖</div><div><div class="ht">ผู้ช่วย AI · ถาม-ตอบ 24 ชม.</div><div class="hd">เวลาทำการ · เอกสารที่ต้องใช้ · ขั้นตอนบริการ</div></div>
+  </a>
+
+  <footer>LINE OA Smart Municipality · ระบบ Demo คลิกเล่นได้จริง<br/>ข้อมูลตัวอย่างเก็บในเครื่องของคุณ (localStorage)</footer>
+</div>
+<div class="toast" id="toast"></div>
+
+<script>
+const $=s=>document.querySelector(s);
+function toast(m){const t=$('#toast');t.textContent=m;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),2200);}
+function read(k){try{return JSON.parse(localStorage.getItem(k));}catch(e){return null;}}
+
+/* greeting by time */
+(function(){const h=new Date().getHours();let g='สวัสดีครับ';if(h<12)g='อรุณสวัสดิ์ครับ ☀️';else if(h<17)g='สวัสดียามบ่ายครับ';else g='สวัสดียามค่ำครับ 🌙';$('#greet').textContent=g+' 👋';})();
+
+/* live stats from each module's localStorage (shared origin) */
+function statify(){
+  const d=read('sm_demo_v1'), b=read('sm_billing_v1'), q=read('sm_queue_v1'), w=read('sm_welfare_v1'), e=read('sm_eservice_v1');
+  const open = d? d.requests.filter(r=>r.status!=='done').length : null;
+  const bills = b? b.bills.filter(x=>x.status!=='paid').length : null;
+  const queue = q? q.bookings.filter(x=>x.status==='waiting').length : null;
+  const ben = w? w.b.filter(x=>x.status==='approved').length : (e? e.apps.filter(a=>['submitted','reviewing','need_docs'].includes(a.status)).length : null);
+  const benLabel = w? 'ผู้รับสวัสดิการ' : 'คำขอรอพิจารณา';
+  const cell=(cls,n,l)=>`<div class="stat ${cls}"><div class="n">${n==null?'—':n}</div><div class="l">${l}</div></div>`;
+  $('#stats').innerHTML = cell('s1',open,'เรื่องรอดำเนินการ')+cell('s2',bills,'บิลค้างชำระ')+cell('s3',queue,'คิวที่รออยู่')+cell('s4',ben,benLabel);
+}
+statify();
+
+/* service tiles */
+const TILES=[
+  {href:'../',          ic:'🚨', c:'linear-gradient(135deg,#ef4444,#dc2626)', t:'แจ้งปัญหา & ติดตาม', d:'ถนน/ไฟฟ้า/น้ำท่วม/ขยะ แนบรูป+พิกัด', badge:'ยอดนิยม', bc:'#fde8e6', bcc:'#b91c1c'},
+  {href:'../billing/',  ic:'💰', c:'linear-gradient(135deg,#0891b2,#0e7490)', t:'ภาษี & ชำระเงิน', d:'ภาษีที่ดิน · ค่าน้ำ · ค่าขยะ จ่ายผ่าน QR'},
+  {href:'../queue/',    ic:'📅', c:'linear-gradient(135deg,#6366f1,#4338ca)', t:'จองคิวออนไลน์', d:'จองล่วงหน้า รับบัตรคิวดิจิทัล'},
+  {href:'../eservice/', ic:'📋', c:'linear-gradient(135deg,#ea580c,#c2410c)', t:'ขอใบอนุญาต/เอกสาร', d:'ก่อสร้าง · ทะเบียนพาณิชย์ · หนังสือรับรอง'},
+  {href:'../welfare/',  ic:'🤝', c:'linear-gradient(135deg,#7c3aed,#5b21b6)', t:'สวัสดิการ/เบี้ยยังชีพ', d:'ผู้สูงอายุ · พิการ · เด็กแรกเกิด'},
+  {href:'#contact',     ic:'📞', c:'linear-gradient(135deg,#1f9d55,#15803d)', t:'ติดต่อ/สายด่วน', d:'เบอร์โทร · แผนที่ · เวลาทำการ', contact:true},
+];
+$('#grid').innerHTML=TILES.map(x=>`<a class="tile" href="${x.href}" ${x.contact?'data-contact="1"':''}>
+  <div class="ic" style="background:${x.c}">${x.ic}</div>
+  <div class="tt">${x.t}</div><div class="td">${x.d}</div>
+  ${x.badge?`<span class="badge" style="background:${x.bc};color:${x.bcc}">★ ${x.badge}</span>`:''}
+  <span class="arrow">›</span></a>`).join('');
+document.querySelectorAll('[data-contact]').forEach(a=>a.onclick=e=>{e.preventDefault();toast('☎️ สายด่วน อบต. 0-2xxx-xxxx · ทำการ จ-ศ 08.30–16.30 น.');});
+
+/* news from report module (fallback to defaults) */
+const d=read('sm_demo_v1');
+const news = (d&&d.news&&d.news.length)? d.news : [
+  {cat:'ประกาศด่วน',title:'แจ้งหยุดจ่ายน้ำประปาชั่วคราว',body:'22 มิ.ย. 09.00–15.00 น. หมู่ 3 และ หมู่ 5'},
+  {cat:'กิจกรรมชุมชน',title:'โครงการ Big Cleaning Day',body:'เสาร์ที่ 28 มิ.ย. ณ ศาลาประชาคม'},
+];
+$('#news').innerHTML=news.slice(0,3).map(n=>`<div class="newsitem"><div class="cat">📢 ${n.cat}</div><div class="nt">${n.title}</div><div class="nb">${n.body}</div></div>`).join('');
+</script>
+</body>
+</html>
