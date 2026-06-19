@@ -1,0 +1,324 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0" />
+<title>ระบบสวัสดิการ/เบี้ยยังชีพ — อบต.บึงคำพร้อย Demo</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
+<style>
+  :root{
+    --vt:#7c3aed;--vt-dark:#5b21b6;--vt-soft:#f3edff;
+    --green:#1f9d55;--green-dark:#15803d;--green-light:#dcf5e6;
+    --blue:#2563eb;--blue-soft:#e7efff;--amber:#f59e0b;--amber-soft:#fef4e2;
+    --red:#ef4444;--red-soft:#fde8e6;--ink:#1b1530;--muted:#6b6480;--bg:#f3f1f8;--card:#fff;
+    --radius:16px;--shadow:0 8px 24px rgba(45,27,80,.08);--shadow-lg:0 18px 44px rgba(45,27,80,.16);
+  }
+  *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;}
+  body{font-family:'Prompt',system-ui,sans-serif;background:var(--bg);color:var(--ink);line-height:1.5;}
+  button,input,select,textarea{font-family:inherit;font-size:inherit;}
+  .app{max-width:920px;margin:0 auto;min-height:100vh;}
+  .topbar{position:sticky;top:0;z-index:30;background:linear-gradient(135deg,var(--vt-dark),var(--vt));color:#fff;padding:11px 16px;display:flex;align-items:center;gap:11px;box-shadow:0 4px 14px rgba(0,0,0,.12);}
+  .topbar .seal{width:36px;height:36px;border-radius:10px;background:rgba(255,255,255,.2);display:grid;place-items:center;font-size:19px;flex:none;}
+  .topbar .ttl{font-weight:700;font-size:14.5px;line-height:1.2;}
+  .topbar .ttl small{display:block;font-weight:400;font-size:10.5px;opacity:.85;}
+  .topbar .reset{margin-left:auto;background:rgba(255,255,255,.18);border:none;color:#fff;padding:7px 11px;border-radius:9px;font-size:12px;cursor:pointer;}
+  .nav2{display:flex;gap:6px;padding:8px 12px;background:#fff;font-size:12.5px;align-items:center;box-shadow:0 2px 8px rgba(0,0,0,.04);overflow-x:auto;}
+  .nav2 a{color:var(--muted);text-decoration:none;padding:5px 9px;border-radius:8px;font-weight:600;white-space:nowrap;}
+  .nav2 a:hover{background:var(--vt-soft);color:var(--vt-dark);}
+  .nav2 .sep{color:#d6d3e1;}
+  .roles{display:flex;gap:6px;padding:10px 12px;background:#fff;position:sticky;top:58px;z-index:25;box-shadow:0 2px 10px rgba(0,0,0,.04);overflow-x:auto;}
+  .role-btn{flex:1;min-width:104px;border:1px solid #e3deec;background:#fff;color:var(--ink);padding:9px 8px;border-radius:11px;font-weight:600;font-size:13px;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:3px;transition:.18s;}
+  .role-btn .em{font-size:18px;}
+  .role-btn.active{background:var(--vt-dark);color:#fff;border-color:var(--vt-dark);box-shadow:0 6px 14px rgba(91,33,182,.25);}
+  main{padding:14px 12px 90px;}
+  .view{animation:fade .3s ease;}
+  @keyframes fade{from{opacity:0;transform:translateY(8px);}to{opacity:1;transform:translateY(0);}}
+  .card{background:var(--card);border-radius:var(--radius);box-shadow:var(--shadow);padding:18px;margin-bottom:14px;border:1px solid #efebf5;}
+  .card h3{font-size:16px;font-weight:700;margin-bottom:4px;display:flex;align-items:center;gap:8px;}
+  .card .hint{font-size:12.5px;color:var(--muted);margin-bottom:12px;}
+  label.fl{display:block;font-size:13px;font-weight:600;margin:13px 0 7px;}
+  input[type=text],select{width:100%;border:1.5px solid #e3deec;border-radius:11px;padding:11px 13px;font-size:14px;background:#fdfcfe;}
+  input:focus,select:focus{outline:none;border-color:var(--vt);background:#fff;}
+
+  .wt-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
+  .wt{border:1.5px solid #e3deec;background:#fff;border-radius:13px;padding:14px;cursor:pointer;transition:.15s;text-align:left;}
+  .wt:hover{border-color:var(--vt);}
+  .wt.sel{border-color:var(--vt-dark);background:var(--vt-soft);}
+  .wt .wi{font-size:26px;}
+  .wt .wn{font-weight:700;font-size:13.5px;margin-top:6px;}
+  .wt .wa{font-size:11.5px;color:var(--vt-dark);font-weight:600;margin-top:2px;}
+
+  .docitem{display:flex;align-items:center;gap:10px;padding:10px 0;border-bottom:1px solid #f1eef7;}
+  .docitem:last-child{border:none;}
+  .docitem .di{width:32px;height:32px;border-radius:9px;background:#f1eef7;display:grid;place-items:center;font-size:15px;flex:none;}
+  .docitem.done .di{background:var(--green-light);}
+  .docitem .dn{flex:1;font-size:13px;font-weight:500;}
+  .docitem .dn small{display:block;color:var(--green-dark);font-weight:400;font-size:11px;}
+
+  .btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;border:none;border-radius:11px;padding:12px 16px;font-weight:600;font-size:14px;cursor:pointer;transition:.18s;}
+  .btn-primary{background:var(--vt);color:#fff;width:100%;box-shadow:0 8px 18px rgba(124,58,237,.3);}
+  .btn-primary:active{transform:scale(.98);}
+  .btn-primary:disabled{opacity:.45;box-shadow:none;}
+  .btn-ghost{background:#fff;border:1.5px solid #e3deec;color:var(--ink);}
+  .btn-sm{padding:8px 12px;font-size:12.5px;border-radius:9px;}
+  .btn-green{background:var(--green);color:#fff;}
+  .btn-red{background:var(--red);color:#fff;}
+
+  .badge{display:inline-flex;align-items:center;gap:6px;padding:5px 11px;border-radius:999px;font-size:12px;font-weight:700;}
+  .b-pending{background:var(--amber-soft);color:#b45309;}
+  .b-approved{background:var(--green-light);color:var(--green-dark);}
+  .b-rejected{background:var(--red-soft);color:#b91c1c;}
+  .dot{width:8px;height:8px;border-radius:50%;}
+
+  .bcard{background:#fff;border:1px solid #efebf5;border-radius:14px;padding:15px;margin-bottom:12px;box-shadow:var(--shadow);}
+  .bcard .top{display:flex;justify-content:space-between;align-items:flex-start;gap:10px;}
+  .bcard .nm{font-weight:700;font-size:15px;}
+  .bcard .code{font-size:11.5px;color:var(--muted);}
+  .bcard .amt{text-align:right;font-weight:800;font-size:16px;color:var(--vt-dark);}
+  .bcard .amt small{display:block;font-size:10.5px;font-weight:500;color:var(--muted);}
+  .bcard .meta{font-size:12.5px;color:var(--muted);display:flex;flex-wrap:wrap;gap:10px;margin-top:8px;}
+  .pays{margin-top:12px;border-top:1px dashed #efe9f5;padding-top:10px;}
+  .pay{display:flex;align-items:center;justify-content:space-between;font-size:12.5px;padding:5px 0;}
+  .pay .pl{display:flex;align-items:center;gap:8px;}
+  .pay .pd{width:8px;height:8px;border-radius:50%;}
+
+  .empty{text-align:center;padding:40px 20px;color:var(--muted);}
+  .empty .em{font-size:42px;}
+  .mini{font-size:11px;color:var(--muted);}
+  .seg{display:flex;gap:6px;margin-bottom:12px;overflow-x:auto;}
+  .seg button{white-space:nowrap;border:1.5px solid #e3deec;background:#fff;color:var(--muted);padding:7px 13px;border-radius:999px;font-size:12.5px;font-weight:600;cursor:pointer;}
+  .seg button.on{background:var(--ink);color:#fff;border-color:var(--ink);}
+  .row{display:flex;gap:8px;flex-wrap:wrap;}
+
+  .kpis{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:14px;}
+  .kpi{border-radius:13px;padding:14px 10px;color:#fff;text-align:center;}
+  .kpi.t{background:linear-gradient(135deg,#7c3aed,#5b21b6);}
+  .kpi.b{background:linear-gradient(135deg,#1f9d55,#15803d);}
+  .kpi.p{background:linear-gradient(135deg,#f59e0b,#d97706);}
+  .kpi .n{font-size:21px;font-weight:800;line-height:1.05;}
+  .kpi .l{font-size:10.5px;opacity:.92;margin-top:4px;}
+  .bar-row{display:flex;align-items:center;gap:10px;margin-bottom:12px;font-size:13px;}
+  .bar-row .nm{width:160px;flex:none;font-weight:500;font-size:12px;display:flex;align-items:center;gap:6px;}
+  .bar-tk{flex:1;background:#efebf5;border-radius:999px;height:10px;overflow:hidden;}
+  .bar-fl{height:100%;border-radius:999px;background:linear-gradient(90deg,#a78bfa,#5b21b6);}
+  .bar-row .vl{width:46px;text-align:right;color:var(--muted);font-weight:700;font-size:11.5px;}
+
+  .toast{position:fixed;left:50%;bottom:26px;transform:translateX(-50%) translateY(40px);background:var(--vt-dark);color:#fff;padding:13px 20px;border-radius:12px;font-size:14px;font-weight:600;box-shadow:var(--shadow-lg);z-index:100;opacity:0;transition:.3s;max-width:90%;text-align:center;}
+  .toast.show{opacity:1;transform:translateX(-50%) translateY(0);}
+  .modal{position:fixed;inset:0;background:rgba(25,15,45,.55);display:none;align-items:center;justify-content:center;z-index:90;padding:18px;}
+  .modal.show{display:flex;}
+  .modal .box{background:#fff;border-radius:20px;padding:24px;max-width:340px;width:100%;text-align:center;animation:pop .3s ease;}
+  @keyframes pop{from{transform:scale(.85);opacity:0;}to{transform:scale(1);opacity:1;}}
+  .ok-circle{width:60px;height:60px;border-radius:50%;background:var(--vt-soft);display:grid;place-items:center;font-size:30px;margin:0 auto 12px;}
+  .modal h3{font-size:18px;font-weight:700;}
+  .modal .cbig{font-size:22px;font-weight:800;color:var(--vt-dark);margin:8px 0 2px;letter-spacing:.5px;}
+  .modal p{color:var(--muted);font-size:13px;margin:2px 0;}
+</style>
+</head>
+<body>
+<div class="app">
+  <div class="topbar">
+    <div class="seal">🤝</div>
+    <div class="ttl">สวัสดิการ/เบี้ยยังชีพ <small>อบต.บึงคำพร้อย · Demo</small></div>
+    <button class="reset" id="resetBtn">↺ รีเซ็ต</button>
+  </div>
+  <div class="nav2"><a href="../">🏠 ระบบหลัก</a><span class="sep">·</span><a href="../billing/">💰 ชำระเงิน</a><span class="sep">·</span><a href="../queue/">📅 จองคิว</a><span class="sep">·</span><a href="../eservice/">📋 ขอใบอนุญาต</a><span class="sep">·</span><a href="../../">📊 หน้านำเสนอ</a></div>
+  <div class="roles" id="roles"></div>
+  <main id="main"></main>
+</div>
+<div class="toast" id="toast"></div>
+<div class="modal" id="modal"><div class="box" id="modalBox"></div></div>
+
+<script>
+/* ============ DATA ============ */
+const KEY='sm_welfare_v1';
+const ME='นายสมชาย ใจดี';
+const WT={
+  elderly:{label:'เบี้ยยังชีพผู้สูงอายุ',icon:'👴',code:'OLD',desc:'อายุ 60 ปีขึ้นไป (ขั้นบันได)',docs:['สำเนาบัตรประชาชน','สำเนาทะเบียนบ้าน','สำเนาสมุดบัญชีธนาคาร']},
+  disabled:{label:'เบี้ยความพิการ',icon:'♿',code:'DIS',desc:'ผู้มีบัตรประจำตัวคนพิการ',docs:['สำเนาบัตรประจำตัวคนพิการ','สำเนาทะเบียนบ้าน','สำเนาสมุดบัญชีธนาคาร']},
+  child:{label:'เงินอุดหนุนเด็กแรกเกิด',icon:'👶',code:'CHD',desc:'เด็กแรกเกิด – 6 ปี',docs:['สูติบัตรเด็ก','สำเนาบัตรประชาชนผู้ปกครอง','สำเนาสมุดบัญชีธนาคาร']},
+  aids:{label:'เบี้ยยังชีพผู้ป่วยเอดส์',icon:'🎗️',code:'AID',desc:'ผู้ป่วยที่แพทย์รับรอง',docs:['ใบรับรองแพทย์','สำเนาบัตรประชาชน','สำเนาสมุดบัญชีธนาคาร']},
+};
+const ST={pending:{t:'รอตรวจสอบสิทธิ',c:'#f59e0b',cls:'b-pending'},approved:{t:'ได้รับสิทธิ',c:'#1f9d55',cls:'b-approved'},rejected:{t:'ไม่ผ่านเกณฑ์',c:'#ef4444',cls:'b-rejected'}};
+const THMON=['ม.ค.','ก.พ.','มี.ค.','เม.ย.','พ.ค.','มิ.ย.','ก.ค.','ส.ค.','ก.ย.','ต.ค.','พ.ย.','ธ.ค.'];
+function curMonth(){const d=new Date();return{y:d.getFullYear()+543,m:d.getMonth()};}
+function monLabel(off){const d=new Date();d.setMonth(d.getMonth()+off);return THMON[d.getMonth()]+' '+String((d.getFullYear()+543)%100);}
+function monKey(off){const d=new Date();d.setMonth(d.getMonth()+off);return(d.getFullYear()+543)+'-'+(d.getMonth()+1);}
+
+function amountFor(type,age){
+  if(type==='elderly'){if(age>=90)return 1000;if(age>=80)return 800;if(age>=70)return 700;return 600;}
+  if(type==='disabled')return age<18?1000:800;
+  if(type==='child')return 600;
+  if(type==='aids')return 500;
+  return 0;
+}
+function mkPays(amount,approved){
+  // last 2 months paid, current scheduled (only if approved)
+  if(!approved)return [];
+  const t=Date.now();
+  return [
+    {key:monKey(-2),label:monLabel(-2),amount,status:'paid',paidAt:t-50*86400000},
+    {key:monKey(-1),label:monLabel(-1),amount,status:'paid',paidAt:t-20*86400000},
+    {key:monKey(0),label:monLabel(0),amount,status:'scheduled',paidAt:null},
+  ];
+}
+function seed(){
+  let id=0;const B=[];
+  const mk=(type,name,age,addr,status,regBy)=>{id++;const amt=amountFor(type,age);
+    B.push({id:'w'+id,code:WT[type].code+'-'+(6900+id),type,name,age,addr,phone:'08x-xxx-'+String(3000+id).slice(-4),
+      bank:'ธ.ก.ส. xxx-x-'+String(10000+id).slice(-5),amount:amt,status,regBy,registeredAt:Date.now()-id*5*86400000,
+      docs:WT[type].docs.map(d=>({name:d,attached:true})),payments:mkPays(amt,status==='approved'),
+      updates:status==='approved'?[{s:'pending',n:'รับลงทะเบียน',by:'ระบบ'},{s:'approved',n:'ตรวจสอบคุณสมบัติผ่าน',by:'กองสวัสดิการ'}]:status==='rejected'?[{s:'pending',n:'รับลงทะเบียน',by:'ระบบ'},{s:'rejected',n:'คุณสมบัติไม่ครบตามเกณฑ์',by:'กองสวัสดิการ'}]:[{s:'pending',n:'รับลงทะเบียน รอตรวจสอบ',by:'ระบบ'}]});};
+  mk('elderly','นางสมบูรณ์ ใจดี',72,'99/1 ม.5',  'approved',ME);   // ME's parent
+  mk('elderly','นายเพิ่ม ทรัพย์มาก',83,'14 ม.3','approved','-');
+  mk('disabled','นางสาวพิกุล แก้วใส',34,'8 ม.8','approved','-');
+  mk('child','ด.ช.ภูมิ รักเรียน',2,'21 ม.1','approved','-');
+  mk('elderly','นายชม ดอกไม้',66,'5 ม.5','pending',ME);            // ME registering, pending
+  mk('disabled','นายมั่นคง อดทน',45,'30 ม.3','pending','-');
+  mk('aids','ผู้ขอรับสิทธิ (ปกปิดชื่อ)',50,'-','approved','-');
+  mk('child','ด.ญ.พลอย สดใส',5,'7 ม.8','rejected','-');
+  return {b:B};
+}
+function load(){try{const d=JSON.parse(localStorage.getItem(KEY));if(d&&d.b)return d;}catch(e){}const s=seed();save(s);return s;}
+function save(d){localStorage.setItem(KEY,JSON.stringify(d));}
+let DB=load();
+
+/* ============ HELPERS ============ */
+const $=s=>document.querySelector(s);
+const baht=n=>'฿'+n.toLocaleString('th-TH');
+function toast(m){const t=$('#toast');t.textContent=m;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),2200);}
+function esc(s){return(s||'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));}
+function fdate(ts){return new Date(ts).toLocaleDateString('th-TH',{day:'numeric',month:'short',year:'2-digit'});}
+
+/* ============ STATE ============ */
+const ROLES=[{id:'citizen',label:'ประชาชน',em:'👨‍👩‍👧‍👦'},{id:'staff',label:'เจ้าหน้าที่',em:'🗃️'},{id:'exec',label:'ผู้บริหาร',em:'📈'}];
+let state={role:'citizen'};
+let cView='reg', sFilter='all';
+let form={type:null,name:'',age:'',addr:'',docs:{}};
+
+function renderChrome(){$('#roles').innerHTML=ROLES.map(r=>`<button class="role-btn ${r.id===state.role?'active':''}" data-role="${r.id}"><span class="em">${r.em}</span>${r.label}</button>`).join('');}
+function render(){renderChrome();const v={citizen:vCitizen,staff:vStaff,exec:vExec}[state.role];$('#main').innerHTML=`<div class="view">${v()}</div>`;bind();}
+
+/* ============ CITIZEN ============ */
+function vCitizen(){
+  const mine=DB.b.filter(x=>x.regBy===ME);
+  const tabs=`<div class="seg"><button class="${cView==='reg'?'on':''}" data-cv="reg">➕ ลงทะเบียนขอรับสิทธิ</button><button class="${cView==='mine'?'on':''}" data-cv="mine">🪪 สิทธิของฉัน${mine.length?' ('+mine.length+')':''}</button></div>`;
+  return tabs+(cView==='reg'?vReg():vMine(mine));
+}
+function vReg(){
+  const wt=`<label class="fl">1. เลือกประเภทสวัสดิการ</label><div class="wt-grid">${Object.entries(WT).map(([k,w])=>`<button class="wt ${form.type===k?'sel':''}" data-wt="${k}"><div class="wi">${w.icon}</div><div class="wn">${w.label}</div><div class="wa">${w.desc}</div></button>`).join('')}</div>`;
+  let rest='';
+  if(form.type){const w=WT[form.type];const done=Object.values(form.docs).filter(Boolean).length,need=w.docs.length;
+    const ageN=parseInt(form.age||'0',10);const amt=ageN?amountFor(form.type,ageN):null;
+    rest=`<label class="fl">2. ข้อมูลผู้มีสิทธิ</label>
+      <input type="text" id="fName" placeholder="ชื่อ-นามสกุล ผู้มีสิทธิ" value="${esc(form.name)}" />
+      <input type="text" id="fAge" inputmode="numeric" placeholder="อายุ (ปี)" value="${esc(form.age)}" style="margin-top:8px" />
+      <input type="text" id="fAddr" placeholder="ที่อยู่ตามทะเบียนบ้าน" value="${esc(form.addr)}" style="margin-top:8px" />
+      ${amt!=null?`<div class="card" style="margin:10px 0 0;background:var(--vt-soft);border-color:#ddd0f7;padding:12px"><div style="font-size:13px">อัตราเบี้ยที่จะได้รับโดยประมาณ: <b style="color:var(--vt-dark)">${baht(amt)}/เดือน</b></div></div>`:''}
+      <label class="fl">3. แนบเอกสาร (${done}/${need})</label>
+      <div>${w.docs.map((d,i)=>{const ok=form.docs[i];return `<div class="docitem ${ok?'done':''}"><div class="di">${ok?'✅':'📎'}</div><div class="dn">${d}${ok?`<small>แนบแล้ว: ${esc(ok)}</small>`:''}</div><button class="btn ${ok?'btn-ghost':'btn-primary'} btn-sm" data-doc="${i}" style="width:auto;flex:none">${ok?'เปลี่ยน':'แนบ'}</button></div>`;}).join('')}</div>
+      <input type="file" id="docFile" hidden />
+      <button class="btn btn-primary" id="submitReg" style="margin-top:16px" ${done===need&&form.name&&ageN?'':'disabled'}>📝 ลงทะเบียนขอรับสิทธิ</button>`;
+  }
+  return `<div class="card"><h3>🤝 ลงทะเบียนขอรับสวัสดิการ</h3><div class="hint">ลงทะเบียนออนไลน์ เจ้าหน้าที่ตรวจสอบคุณสมบัติและแจ้งผล</div>${wt}${rest}</div>`;
+}
+function vMine(mine){
+  if(!mine.length)return `<div class="empty"><div class="em">🪪</div>ยังไม่มีการลงทะเบียน<br/><span class="mini">กด "ลงทะเบียนขอรับสิทธิ"</span></div>`;
+  return mine.slice().sort((a,b)=>b.registeredAt-a.registeredAt).map(bCard).join('');
+}
+function bCard(b){
+  const w=WT[b.type],st=ST[b.status];
+  const pays=b.status==='approved'?`<div class="pays"><div class="mini" style="font-weight:600;margin-bottom:4px">ประวัติการรับเงิน</div>${b.payments.slice().reverse().map(p=>`<div class="pay"><div class="pl"><span class="pd" style="background:${p.status==='paid'?'#1f9d55':'#f59e0b'}"></span>${p.label}</div><div>${baht(p.amount)} · ${p.status==='paid'?'✅ โอนแล้ว '+fdate(p.paidAt):'⏳ รอโอน'}</div></div>`).join('')}</div>`:'';
+  return `<div class="bcard"><div class="top"><div><div class="nm">${w.icon} ${esc(b.name)}</div><div class="code">${b.code} · ${w.label} · อายุ ${b.age} ปี</div></div>
+    <div class="amt">${baht(b.amount)}<small>ต่อเดือน</small></div></div>
+    <div class="meta"><span class="badge ${st.cls}"><span class="dot" style="background:${st.c}"></span>${st.t}</span><span>🏦 ${esc(b.bank)}</span></div>
+    ${b.status==='rejected'?`<div class="mini" style="margin-top:8px;color:#b91c1c">เหตุผล: ${esc(b.updates[b.updates.length-1].n)}</div>`:''}
+    ${pays}</div>`;
+}
+function submitReg(){
+  const w=WT[form.type];const age=parseInt($('#fAge').value||'0',10);const amt=amountFor(form.type,age);
+  const id='w'+Date.now();
+  const b={id,code:w.code+'-'+(6900+DB.b.length+1),type:form.type,name:$('#fName').value,age,addr:$('#fAddr').value,
+    phone:'08x-xxx-xxxx',bank:'รอแจ้งเลขบัญชี',amount:amt,status:'pending',regBy:ME,registeredAt:Date.now(),
+    docs:w.docs.map((d,i)=>({name:d,attached:!!form.docs[i]})),payments:[],updates:[{s:'pending',n:'รับลงทะเบียน รอตรวจสอบคุณสมบัติ',by:'ระบบ'}]};
+  DB.b.push(b);save(DB);
+  $('#modalBox').innerHTML=`<div class="ok-circle">📝</div><h3>ลงทะเบียนสำเร็จ</h3><div class="cbig">${b.code}</div>
+    <p>${w.icon} ${w.label}</p><p class="mini" style="margin-top:8px">เจ้าหน้าที่จะตรวจสอบคุณสมบัติและแจ้งผลผ่านระบบ</p>
+    <button class="btn btn-primary" id="afterReg" style="margin-top:14px">ดูสิทธิของฉัน</button>`;
+  $('#modal').classList.add('show');form={type:null,name:'',age:'',addr:'',docs:{}};
+}
+
+/* ============ STAFF ============ */
+function vStaff(){
+  const all=DB.b.slice();
+  const pending=all.filter(b=>b.status==='pending').length;
+  const approved=all.filter(b=>b.status==='approved');
+  const dueNow=approved.filter(b=>b.payments.some(p=>p.key===monKey(0)&&p.status==='scheduled')).length;
+  const budget=approved.reduce((s,b)=>s+b.amount,0);
+  let list=sFilter==='all'?all:all.filter(b=>b.status===sFilter);
+  list=list.sort((a,b)=>({pending:0,approved:1,rejected:2}[a.status])-({pending:0,approved:1,rejected:2}[b.status]));
+  const head=`<div class="card"><h3>🗃️ ทะเบียนผู้รับสวัสดิการ</h3><div class="hint">ตรวจสอบสิทธิ และจ่ายเบี้ยประจำเดือน ${monLabel(0)}</div>
+    <div class="kpis"><div class="kpi t"><div class="n">${approved.length}</div><div class="l">ผู้รับสิทธิ</div></div>
+    <div class="kpi p"><div class="n">${pending}</div><div class="l">รอตรวจสอบ</div></div>
+    <div class="kpi b"><div class="n">${baht(budget)}</div><div class="l">งบเบี้ย/เดือน</div></div></div>
+    <button class="btn btn-primary" id="payAll" ${dueNow?'':'disabled'} style="margin-bottom:6px">💸 จ่ายเบี้ยประจำเดือน ${monLabel(0)} (${dueNow} ราย)</button>
+    <div class="seg" style="margin-top:10px"><button class="${sFilter==='all'?'on':''}" data-s="all">ทั้งหมด (${all.length})</button>
+      <button class="${sFilter==='pending'?'on':''}" data-s="pending">🟡 รอตรวจสอบ</button>
+      <button class="${sFilter==='approved'?'on':''}" data-s="approved">🟢 ได้สิทธิ</button></div></div>`;
+  const rows=list.map(b=>{const w=WT[b.type],st=ST[b.status];
+    let act='';
+    if(b.status==='pending')act=`<div class="row" style="margin-top:8px"><button class="btn btn-green btn-sm appBtn" data-id="${b.id}" data-act="approved">อนุมัติสิทธิ</button><button class="btn btn-red btn-sm appBtn" data-id="${b.id}" data-act="rejected">ไม่ผ่านเกณฑ์</button></div>`;
+    const curPaid=b.status==='approved'?(b.payments.find(p=>p.key===monKey(0))||{}).status:null;
+    return `<div class="bcard"><div class="top"><div><div class="nm">${w.icon} ${esc(b.name)}</div><div class="code">${b.code} · ${w.label} · อายุ ${b.age}</div></div>
+      <div class="amt">${baht(b.amount)}<small>/เดือน</small></div></div>
+      <div class="meta"><span class="badge ${st.cls}"><span class="dot" style="background:${st.c}"></span>${st.t}</span><span>📍 ${esc(b.addr)}</span>${curPaid?`<span style="color:${curPaid==='paid'?'#15803d':'#b45309'}">${monLabel(0)}: ${curPaid==='paid'?'โอนแล้ว':'รอโอน'}</span>`:''}</div>
+      ${act}</div>`;
+  }).join('');
+  return head+(list.length?rows:`<div class="empty"><div class="em">✅</div>ไม่มีรายการ</div>`);
+}
+
+/* ============ EXEC ============ */
+function vExec(){
+  const all=DB.b;const approved=all.filter(b=>b.status==='approved');
+  const pending=all.filter(b=>b.status==='pending').length;
+  const budget=approved.reduce((s,b)=>s+b.amount,0);
+  const paidThis=approved.reduce((s,b)=>{const p=b.payments.find(x=>x.key===monKey(0));return s+(p&&p.status==='paid'?p.amount:0);},0);
+  const byType=Object.entries(WT).map(([k,w])=>{const bs=approved.filter(b=>b.type===k);return{w,n:bs.length,bud:bs.reduce((s,b)=>s+b.amount,0)};}).filter(x=>x.n>0).sort((a,b)=>b.n-a.n);
+  const nmax=Math.max(1,...byType.map(x=>x.n));
+  return `<div class="card"><h3>📈 Dashboard สวัสดิการ <span class="mini" style="font-weight:400">· ${monLabel(0)}</span></h3>
+    <div class="kpis"><div class="kpi t"><div class="n">${approved.length}</div><div class="l">ผู้รับสิทธิทั้งหมด</div></div>
+    <div class="kpi b"><div class="n">${baht(budget)}</div><div class="l">งบเบี้ย/เดือน</div></div>
+    <div class="kpi p"><div class="n">${pending}</div><div class="l">รออนุมัติ</div></div></div>
+    <div class="bar-row"><span class="nm">จ่ายแล้วเดือนนี้</span><div class="bar-tk"><div class="bar-fl" style="width:${budget?Math.round(paidThis/budget*100):0}%"></div></div><span class="vl">${budget?Math.round(paidThis/budget*100):0}%</span></div>
+    <div class="mini">โอนแล้ว ${baht(paidThis)} จากงบ ${baht(budget)}</div>
+  </div>
+  <div class="card"><h3>👥 ผู้รับสิทธิตามประเภท</h3>${byType.map(x=>`<div class="bar-row"><span class="nm">${x.w.icon} ${x.w.label}</span><div class="bar-tk"><div class="bar-fl" style="width:${x.n/nmax*100}%"></div></div><span class="vl">${x.n} ราย</span></div>`).join('')}</div>
+  <div class="card"><h3>💰 งบประมาณรายเดือนตามประเภท</h3>${byType.map(x=>`<div class="row" style="justify-content:space-between;padding:7px 0;border-bottom:1px solid #f1eef7"><span>${x.w.icon} ${x.w.label}</span><b>${baht(x.bud)}</b></div>`).join('')}<div class="row" style="justify-content:space-between;padding:9px 0 0;font-size:15px"><b>รวมทั้งสิ้น</b><b style="color:var(--vt-dark)">${baht(budget)}</b></div></div>`;
+}
+
+/* ============ BIND ============ */
+let pendingDoc=null;
+function bind(){
+  document.querySelectorAll('[data-cv]').forEach(b=>b.onclick=()=>{cView=b.dataset.cv;render();});
+  document.querySelectorAll('[data-wt]').forEach(b=>b.onclick=()=>{if(form.type!==b.dataset.wt){form.type=b.dataset.wt;form.docs={};}render();});
+  ['fName','fAge','fAddr'].forEach(idf=>{const el=$('#'+idf);if(el)el.oninput=()=>{const k={fName:'name',fAge:'age',fAddr:'addr'}[idf];form[k]=el.value;if(idf==='fAge')render();};});
+  document.querySelectorAll('[data-doc]').forEach(b=>b.onclick=()=>{pendingDoc=b.dataset.doc;$('#docFile').click();});
+  const df=$('#docFile');if(df)df.onchange=()=>{if(df.files[0]&&pendingDoc!==null){form.docs[pendingDoc]=df.files[0].name;render();}};
+  const sr=$('#submitReg');if(sr)sr.onclick=submitReg;
+  document.querySelectorAll('[data-s]').forEach(b=>b.onclick=()=>{sFilter=b.dataset.s;render();});
+  document.querySelectorAll('.appBtn').forEach(b=>b.onclick=()=>{
+    const x=DB.b.find(z=>z.id===b.dataset.id),act=b.dataset.act;x.status=act;
+    if(act==='approved'){x.payments=mkPays(x.amount,true);x.updates.push({s:'approved',n:'ตรวจสอบคุณสมบัติผ่าน อนุมัติสิทธิ',by:'กองสวัสดิการ'});}
+    else{x.updates.push({s:'rejected',n:'คุณสมบัติไม่ครบตามเกณฑ์',by:'กองสวัสดิการ'});}
+    save(DB);toast(act==='approved'?'✅ อนุมัติสิทธิแล้ว':'บันทึก: ไม่ผ่านเกณฑ์');render();});
+  const pa=$('#payAll');if(pa)pa.onclick=()=>{let n=0;DB.b.filter(b=>b.status==='approved').forEach(b=>{const p=b.payments.find(x=>x.key===monKey(0));if(p&&p.status==='scheduled'){p.status='paid';p.paidAt=Date.now();n++;}});save(DB);toast('💸 โอนเบี้ยแล้ว '+n+' ราย');render();};
+}
+$('#roles').onclick=e=>{const b=e.target.closest('[data-role]');if(!b)return;state.role=b.dataset.role;cView='reg';sFilter='all';render();};
+$('#modal').onclick=e=>{if(e.target.id==='afterReg'){$('#modal').classList.remove('show');cView='mine';render();return;}if(e.target===$('#modal'))$('#modal').classList.remove('show');};
+$('#resetBtn').onclick=()=>{if(confirm('รีเซ็ตข้อมูลตัวอย่างสวัสดิการกลับเป็นค่าเริ่มต้น?')){localStorage.removeItem(KEY);DB=load();toast('♻️ รีเซ็ตแล้ว');render();}};
+render();
+</script>
+</body>
+</html>

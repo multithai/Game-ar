@@ -352,7 +352,8 @@ function vService(){
   return `<div class="card"><h3>📄 ขอรับบริการออนไลน์</h3><div class="hint">เลือกบริการที่ต้องการ (ตัวอย่างหน้าจอ)</div>
     <a href="billing/" class="btn btn-primary" style="text-decoration:none;margin-bottom:10px">💰 ภาษี & ชำระเงินออนไลน์ →</a>
     <a href="queue/" class="btn btn-primary" style="text-decoration:none;margin-bottom:10px;background:#6366f1;box-shadow:0 8px 18px rgba(99,102,241,.3)">📅 จองคิวรับบริการ →</a>
-    <a href="eservice/" class="btn btn-primary" style="text-decoration:none;margin-bottom:12px;background:#ea580c;box-shadow:0 8px 18px rgba(234,88,12,.3)">📋 ขอใบอนุญาต/เอกสาร (e-Service) →</a>
+    <a href="eservice/" class="btn btn-primary" style="text-decoration:none;margin-bottom:10px;background:#ea580c;box-shadow:0 8px 18px rgba(234,88,12,.3)">📋 ขอใบอนุญาต/เอกสาร (e-Service) →</a>
+    <a href="welfare/" class="btn btn-primary" style="text-decoration:none;margin-bottom:12px;background:#7c3aed;box-shadow:0 8px 18px rgba(124,58,237,.3)">🤝 สวัสดิการ/เบี้ยยังชีพ →</a>
     <div class="chips" style="flex-direction:column;align-items:stretch">${items.map(i=>`<div class="chip" style="justify-content:flex-start" onclick="window.__t('เปิดบริการ: ${i[1]} (เดโม)')"><span style="font-size:20px">${i[0]}</span><div style="text-align:left"><div style="font-weight:600">${i[1]}</div><div class="mini">${i[2]}</div></div></div>`).join('')}</div></div>`;
 }
 window.__t=toast;
